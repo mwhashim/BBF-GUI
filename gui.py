@@ -126,7 +126,7 @@ class Application(Frame):
         self.Frame_0 = Frame(self.master, bg="white smoke")
         self.Frame_0.grid(row = 0, column = 0, rowspan = 5, columnspan = 5, sticky = W+E+N+S)
         
-        Background_photo = PhotoImage(file="cosmicenviro.gif")
+        Background_photo = PhotoImage(file="BBF-Logo.gif")
         Welcome_Frame = Label(self.Frame_0, image = Background_photo)
         Welcome_Frame.photo = Background_photo
         Welcome_Frame.pack() 
