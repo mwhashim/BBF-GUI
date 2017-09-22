@@ -122,7 +122,21 @@ class Application(Frame):
         self.master.rowconfigure(0, weight=0)
         #self.master.columnconfigure(0, weight=0)
 
+        # Frame 0 :------------------------------------------------------
+        self.Frame_0 = Frame(self.master, bg="white smoke")
+        self.Frame_0.grid(row = 0, column = 0, rowspan = 5, columnspan = 5, sticky = W+E+N+S)
+        
+        Background_photo = PhotoImage(file="cosmicenviro.gif")
+        Welcome_Frame = Label(self.Frame_0, image = Background_photo)
+        Welcome_Frame.photo = Background_photo
+        Welcome_Frame.pack() 
+        
+        Welcome_buttom = Button(self.Frame_0, text=u"Click to Create Your Universe", command=self.Sim_Create)
+        Welcome_buttom.pack()
+        
         #---------------------------------------
+    def Sim_Create(self):
+        self.Frame_0.destroy()
         self.initialize()
         self.Toolbar(self.Frame_1);
         self.PlotPan(self.Frame_3)
