@@ -454,7 +454,7 @@ class Application(Frame):
         dens_map = load(filenames[0]); dens_map0 = load(filenames[-1]); print dens_map0.min()+1, dens_map0.max()+1.
         im = self.ax1.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
-        self.ax1.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(0., 30.), textcoords='data')
+        self.ax1.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.time = self.ax1.text(0.15, 0.1 , 'Age of the Universe: %s Gyr' %round(lktime[0],3), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax1.transAxes, fontsize=10)
 
 
@@ -465,12 +465,12 @@ class Application(Frame):
         self.ax1.add_artist(ab)
 
         #iMpc = lambda x: x*1024/125  #x in Mpc, return in Pixel *3.085e19
-        ob = AnchoredHScaleBar(size=1, label="1Mpc", loc=5, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
+        ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax1.add_artist(ob)
 
         self.canvas.mpl_connect('button_press_event', self.onClick)
         self.ani = animation.FuncAnimation(self.f, animate, filenames, repeat=False, interval=25, blit=False)
-        self.ax1.axis('on'); self.canvas.show()
+        self.ax1.axis('off'); self.canvas.show()
 
         self.progress["value"] = 0
         self.maxframes = 300
