@@ -192,9 +192,10 @@ class Application(Frame):
 
         self.f = plt.Figure()
         self.ax1 = self.f.add_subplot(111); self.ax1.axis('off')
+        self.f.tight_layout()
 
         self.canvas = FigureCanvasTkAgg(self.f, master = frame)
-        self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
+        #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
         self.canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
         self.canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
