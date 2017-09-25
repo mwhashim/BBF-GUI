@@ -2,6 +2,8 @@ from __future__ import division
 import os, sys
 sys.setrecursionlimit(50000) # to solve maximum recursion depth exceeded error !!
 
+import shutil
+
 import logging
 import glob
 from threading import Thread
@@ -71,6 +73,8 @@ from PIL import Image, ImageTk
 
 from astropy.cosmology import wCDM
 
+from emailling import *
+
 #----------------------------------
 def destroy(e): sys.exit()
 
@@ -88,7 +92,7 @@ right = left + width
 top = bottom + height
 
 #--- CWD -----
-#CWD = os.getcwd(); print CWD
+CWD = os.getcwd()#; print CWD
 #CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
 
 class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
@@ -118,27 +122,31 @@ class Application(Frame):
         self.master.title("Big Bang Factory")
 
         #---------------------------------------
-        for r in range(6):
+        for r in range(7):
             self.master.rowconfigure(r, weight=2)
-        for c in range(5):
-            self.master.columnconfigure(c, weight=2)
+#        for c in range(5):
+#            self.master.columnconfigure(c, weight=2)
         #---------------------------------------
-        self.master.rowconfigure(0, weight=0)
+        self.master.columnconfigure(3, weight=2)
+        self.master.columnconfigure(4, weight=2)
+        self.master.columnconfigure(5, weight=2)
+        #self.master.rowconfigure(0, weight=0)
         #self.master.columnconfigure(0, weight=0)
         self.welcome_screen(self.master)
             
     def goback(self):
-        self.status.grid_forget(); self.Frame_1.grid_forget(); self.Frame_2.grid_forget(); self.Frame_3.grid_forget(); self.welcome_screen(self.master)
+        self.status.grid_forget(); self.Frame_2.grid_forget(); self.Frame_3.grid_forget(); self.welcome_screen(self.master)
     
     def welcome_screen(self, frame):
         # Frame 0 :------------------------------------------------------
         self.Frame_0 = Frame(frame, bg="white smoke")
-        self.Frame_0.grid(row = 0, column = 0, rowspan = 5, columnspan = 5, sticky = W+E+N+S)
+        self.Frame_0.grid(row = 0, column = 0, rowspan = 7, columnspan = 6, sticky = W+E+N+S)
         
-        Background_photo = PhotoImage(file="BBF-Logo.gif")
-        Welcome_Frame = Label(self.Frame_0, image = Background_photo)
-        Welcome_Frame.photo = Background_photo
-        Welcome_Frame.pack() 
+        self.original = Image.open("BBF-Logo.gif"); self.Background_photo = ImageTk.PhotoImage(self.original)
+        self.Welcome_Frame = Canvas(self.Frame_0) #, image = Background_photo
+        self.Welcome_Frame.create_image(0, 0, image=self.Background_photo, anchor=NW, tags="IMG")
+        self.Welcome_Frame.pack(side=TOP, fill=BOTH, expand=1)
+        self.Frame_0.bind("<Configure>", self.resize)
         
         Welcome_buttom = Button(self.Frame_0, text=u"Click to Create Your Universe", command=self.Sim_Create)
         Welcome_buttom.pack()
@@ -161,20 +169,20 @@ class Application(Frame):
         # Status Bar :-----
         self.statusVariable = StringVar()
         self.status = Label(self.master, textvariable = self.statusVariable, anchor = "w", fg = "yellow", bg = "blue")
-        self.status.grid(column = 0, row = 7,columnspan = 5, sticky = 'EWS')
+        self.status.grid(column = 0, row = 7,columnspan = 7, sticky = 'EWS')
         self.statusVariable.set(u"Welcome to Big Bang Factory")
 
-        # Frame 1 :------------------------------------------------------
-        self.Frame_1 = PanedWindow(self.master, bg="white smoke")
-        self.Frame_1.grid(row = 0, column = 0, rowspan = 1, columnspan = 5, sticky = W+E+N+S)
+#        # Frame 1 :------------------------------------------------------
+#        self.Frame_1 = PanedWindow(self.master, bg="white smoke")
+#        self.Frame_1.grid(row = 0, column = 0, rowspan = 1, columnspan = 5, sticky = W+E+N+S)
 
         # Frame 2 :-----------------------------------------------------
         self.Frame_2 = Frame(self.master, bg="white", bd= 1, relief= RIDGE)
-        self.Frame_2.grid(row = 1, column = 0, rowspan = 5, columnspan = 2, sticky = W+E+N+S)
+        self.Frame_2.grid(row = 0, column = 0, rowspan = 7, columnspan = 2, sticky = W+E+N+S)
 
         # Frame 3 :-----------------------------------------------------
         self.Frame_3 = Frame(self.master, bg="white", bd= 3, relief= GROOVE)
-        self.Frame_3.grid(row = 1, column = 2, rowspan = 5, columnspan = 3, sticky = W+E+N+S)
+        self.Frame_3.grid(row = 0, column = 3, rowspan = 7, columnspan = 3, sticky = W+E+N+S)
 #
 #        # Frame 4 :------------------------------------------------------
 #        self.Frame_4 = Frame(self.master, bg="white smoke", bd= 5, relief= RIDGE)
@@ -187,6 +195,7 @@ class Application(Frame):
         menu.add_command(label="Open", command=self.ModelDirectory)
         menu.add_command(label="New", command=self.run_reset)
         menu.add_command(label="Save", command=self.save_movie)
+        menu.add_command(label="Send", command=self.send_movie)
         menu.add_command(label="Go Back", command=self.goback)
         menu.add_command(label="Exit", command=root.quit)
         menu.add_separator()
@@ -207,7 +216,8 @@ class Application(Frame):
 
     def PlotPan(self, frame):
         fig = plt.Figure()
-        ax = fig.add_subplot(111); ax.axis('off'); fig.set_tight_layout(True) # fig.tight_layout()
+        ax = fig.add_subplot(111); ax.axis('off'); ax.get_xaxis().set_visible(False); ax.get_yaxis().set_visible(False)
+        fig.set_tight_layout(True) # fig.tight_layout()
         
         canvas = FigureCanvasTkAgg(fig, master = frame)
         #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
@@ -220,11 +230,11 @@ class Application(Frame):
 
         #------------------------
         self.main_nb = ttk.Notebook(frame, padding = -5)
-        self.Main_page = ttk.Frame(self.main_nb); self.Anals_page = ttk.Frame(self.main_nb)
+        self.Main_page = ttk.Frame(self.main_nb)#; self.Anals_page = ttk.Frame(self.main_nb)
 
         #------------------------
         self.main_nb.add(self.Main_page, text='Main')
-        self.main_nb.add(self.Anals_page, text='Analysis & Results')
+        #self.main_nb.add(self.Anals_page, text='Analysis & Results')
         #self.main_nb.add(self.SysPerf_page, text='System Preferences')
         self.main_nb.pack(side="top", fill="both", expand=True)
 
@@ -234,11 +244,11 @@ class Application(Frame):
 
     def MainPage(self, page):
 
-        for r in range(5):
-            page.rowconfigure(r, weight=2)
-
-        for x in range(2):
-            page.columnconfigure(x, weight=2)
+#        for r in range(5):
+#            page.rowconfigure(r, weight=2)
+#
+#        for x in range(2):
+#            page.columnconfigure(x, weight=2)
 
         #------------------------
         self.Entry_Frame = Frame(page, bg="white", bd= 1, relief= RIDGE)
@@ -430,6 +440,7 @@ class Application(Frame):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
         self.Name_Var.set(''); self.Email_Var.set(''); self.Omega_m_Var.set(0.0); self.Omega_l_Var.set(0.0)
         self.Lambda_Var.set('Lambda_'); self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
+        shutil.rmtree(CWD + "/tmp/")
         
         #if self._job1 is not None: self.after_cancel(self._job1); self._job1 = None
     
@@ -462,8 +473,12 @@ class Application(Frame):
         return model
 
     def save_movie(self):
-        writer = animation.writers('ffmpeg')(fps=15)
-        self.ani.save(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
+        self.SaveDirectory()
+        writer = animation.writers['ffmpeg'](fps=15)
+        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
+    
+    def send_movie(self):
+        emailling(self.Email_Var.get(), self.savedir, self.Name_Var.get().split()[-1] + "'s_movie.mp4")
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -475,9 +490,9 @@ class Application(Frame):
         self.progress_var.set(0); self.frames = 0; self.maxframes = 0
         
         
-        Simu_Dir = "/BBF/"+self.model_select()+"/Dens-Maps/"
+        Simu_Dir = self.model_select()+"/Dens-Maps/"
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
-        filenames=sorted(glob.glob(self.CWD + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
+        filenames=sorted(glob.glob(self.simdir + "/" + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
 
         def animate(filename):
             image = np.load(filename); indx = filenames.index(filename) #; image=ndim.gaussian_filter(image,sigma=sys.argv[2],mode='wrap')
@@ -492,7 +507,7 @@ class Application(Frame):
         self.time = self.ax.text(0.15, 0.1 , 'LookBack Time: %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
-        arr_hand = mpimg.imread(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
         imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(30., -40.), xycoords='data', boxcoords="offset points", pad=0.1)
@@ -504,7 +519,7 @@ class Application(Frame):
 
         #self.canvas.mpl_connect('button_press_event', self.onClick)
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
-        self.ax.axis('off'); self.canvas.show()
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
 
         self.progress["value"] = 0; self.maxframes = 300; self.progress["maximum"] = 300
         self.read_frames()
@@ -541,12 +556,12 @@ class Application(Frame):
             return None
 
         try:
-            os.stat(self.CWD + "/users_photo/")
+            os.stat(CWD + "/tmp/")
         except:
-            os.mkdir(self.CWD + "/users_photo/")
+            os.mkdir(CWD + "/tmp/")
 
         self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
-        self.img.save(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
+        self.img.save(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
         #----: CAM stop
         if self._job is not None:
             self.after_cancel(self._job)
@@ -574,7 +589,18 @@ class Application(Frame):
 
     def ModelDirectory(self):
         self.modeldirname = tkFileDialog.askdirectory(parent=root, initialdir='/Users/mahmoud/')
-        self.CWD = self.modeldirname
+        self.simdir = self.modeldirname
+
+    def SaveDirectory(self):
+        self.savedirname = tkFileDialog.askdirectory(parent=root, initialdir='/Users/mahmoud/')
+        self.savedir = self.savedirname
+
+
+    def resize(self, event):
+        size = (event.width, event.height)
+        self.Background_photo = ImageTk.PhotoImage(self.original.resize(size, Image.ANTIALIAS))
+        self.Welcome_Frame.delete("IMG")
+        self.Welcome_Frame.create_image(0, 0, image = self.Background_photo, anchor=NW, tags="IMG")
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
