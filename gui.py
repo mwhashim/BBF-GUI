@@ -5,6 +5,7 @@ sys.setrecursionlimit(50000) # to solve maximum recursion depth exceeded error !
 import logging
 import glob
 from threading import Thread
+import Queue
 #from KThread import *
 
 import time
@@ -52,13 +53,16 @@ import subprocess, shlex
 import ttk
 #import tkFileDialog, Tkconstants
 #import tkinter.filedialog, tkinter.messagebox
-
+#
 if sys.version_info[0] < 3:
     from Tkinter import *
     from Tkinter import _setit
 else:
     from tkinter import *
     from tkinter import _setit
+
+
+#from mttkinter import *
 
 
 import cv2
@@ -85,7 +89,7 @@ top = bottom + height
 
 #--- CWD -----
 #CWD = os.getcwd(); print CWD
-CWD = os.path.dirname(os.path.abspath(__file__))
+CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
 
 class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
     """ size: length of bar in data units
@@ -121,9 +125,14 @@ class Application(Frame):
         #---------------------------------------
         self.master.rowconfigure(0, weight=0)
         #self.master.columnconfigure(0, weight=0)
-
+        self.welcome_screen(self.master)
+            
+    def goback(self):
+        self.Frame_1.grid_forget(); self.Frame_2.grid_forget(); self.Frame_3.grid_forget(); self.welcome_screen(self.master)
+    
+    def welcome_screen(self, frame):
         # Frame 0 :------------------------------------------------------
-        self.Frame_0 = Frame(self.master, bg="white smoke")
+        self.Frame_0 = Frame(frame, bg="white smoke")
         self.Frame_0.grid(row = 0, column = 0, rowspan = 5, columnspan = 5, sticky = W+E+N+S)
         
         Background_photo = PhotoImage(file="BBF-Logo.gif")
@@ -138,8 +147,9 @@ class Application(Frame):
     def Sim_Create(self):
         self.Frame_0.destroy()
         self.initialize()
-        self.Toolbar(self.Frame_1);
-        self.PlotPan(self.Frame_3)
+        self.Menubar()
+        #self.Toolbar(self.Frame_1);
+        self.fig, self.ax, self.canvas = self.PlotPan(self.Frame_3)
         self.MainFrame(self.Frame_2)
 
     def initialize(self):
@@ -169,6 +179,17 @@ class Application(Frame):
 #        # Frame 4 :------------------------------------------------------
 #        self.Frame_4 = Frame(self.master, bg="white smoke", bd= 5, relief= RIDGE)
 #        self.Frame_4.grid(row = 4, column = 2, rowspan = 2, columnspan = 3, sticky = W+E+N+S)
+    def Menubar(self):
+        self.menubar = Menu(self.master)
+        
+        menu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="File", menu=menu)
+        menu.add_command(label="New", command=self.run_reset)
+        menu.add_command(label="Save", command=self.save_movie)
+        menu.add_command(label="Go Back", command=self.goback)
+        menu.add_command(label="Exit", command=root.quit)
+        menu.add_separator()
+        self.master.config(menu=self.menubar)
 
     def Toolbar(self, frame):
         Quit_photo = PhotoImage(file="quit.gif")
@@ -184,21 +205,15 @@ class Application(Frame):
         self.run.pack(side="left")
 
     def PlotPan(self, frame):
-#        self.f, (ax1, ax2) = subplots(2, sharex=True)
-#        self.gs = gridspec.GridSpec(2,1, height_ratios=[3,1])
-#        self.ax1 = subplot(self.gs[0]); #self.ax2 = subplot(gs[1])
-#        #self.ax3 = axes([.16, .35, .3, .3])
-#        self.f.subplots_adjust(hspace=0)#; self.f.tight_layout()
+        fig = plt.Figure()
+        ax = fig.add_subplot(111); ax.axis('off'); fig.set_tight_layout(True) # fig.tight_layout()
 
-        self.f = plt.Figure()
-        self.ax1 = self.f.add_subplot(111); self.ax1.axis('off')
-
-        self.canvas = FigureCanvasTkAgg(self.f, master = frame)
-        self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
-        self.canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
-        self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        self.canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
-
+        canvas = FigureCanvasTkAgg(fig, master = frame)
+        #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
+        #canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
+        #canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
+        canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
+        return fig, ax, canvas
     def MainFrame(self, frame):
 
         #------------------------
@@ -340,7 +355,7 @@ class Application(Frame):
             Grid.rowconfigure(self.DarkMatter_group, y, weight=2)
 
         self.CDM_Var = StringVar()
-        self.CDM_Var.trace('w', self.models_refresh)
+        self.CDM_Var.trace('w', self.models_refresh1)
         self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = 'Cold', variable = self.CDM_Var, value = 'Lambda_')
         self.CDM_RadBtt.grid(row = 0, column = 0, sticky = W)
 
@@ -359,7 +374,7 @@ class Application(Frame):
             Grid.rowconfigure(self.IniMatter_group, y, weight=2)
 
         self.IniM_Var = StringVar()
-        self.IniM_Var.trace('w', self.models_refresh)
+        self.IniM_Var.trace('w', self.models_refresh2)
         self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = 'Gaussian', variable = self.IniM_Var, value = 'Lambda_')
         self.IniM_RadBtt.grid(row = 0, column = 0, sticky = W)
 
@@ -381,7 +396,7 @@ class Application(Frame):
             Grid.rowconfigure(self.MG_group, y, weight=2)
 
         self.MG_Var = StringVar()
-        self.MG_Var.trace('w', self.models_refresh)
+        self.MG_Var.trace('w', self.models_refresh3)
         self.MG_RadBtt = Radiobutton(self.MG_group, text = 'Einstein', variable = self.MG_Var, value = 'Lambda_')
         self.MG_RadBtt.grid(row = 0, column = 0, sticky = W)
 
@@ -404,23 +419,18 @@ class Application(Frame):
         self.Simulation_Run = Button(self.Control_Frame, text = u"Simulation Run", foreground = 'red', command = self.start)
         self.Simulation_Run.grid(column = 0, row = 0, pady = 5, sticky= W+E+N+S)
 
-        self.Save_Run = Button(self.Control_Frame, text = u"Save Movie", foreground = 'red', command = self.save_movie)
-        self.Save_Run.grid(column = 1, row = 0, pady = 5, sticky= W+E+N+S)
-
-        self.Reset_Run = Button(self.Control_Frame, text = u"Reset", foreground = 'red', command = self.run_reset)
-        self.Reset_Run.grid(column = 4, row = 0, pady = 5, sticky= W+E+N+S)
-
         self.progress_var = DoubleVar()
         self.progress = ttk.Progressbar(self.Control_Frame, variable=self.progress_var,  orient="horizontal", length=300, mode="determinate")
         self.progress.grid(column = 0, row = 1, pady = 5, sticky= W+E+N+S, columnspan = 6)
 
 
     def run_reset(self):
-        self.progress_var.set(0); self.ax1.clear(); self.ax1.axis('off'); self.canvas.show()
-
-    def onClick(self, event):
-        global pause
-        pause == True
+        self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
+        self.Name_Var.set(''); self.Email_Var.set(''); self.Omega_m_Var.set(0.0); self.Omega_l_Var.set(0.0)
+        self.Lambda_Var.set('Lambda_'); self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
+        
+        #if self._job1 is not None: self.after_cancel(self._job1); self._job1 = None
+    
 
     def model_select(self):
         if self.Lambda_Var.get() != 'Lambda_':
@@ -431,11 +441,11 @@ class Application(Frame):
                 self.wx = -1.1
 
         elif self.CDM_Var.get()  != 'Lambda_':
-            run_type = self.CDM_Var.get()
+            run_type = self.CDM_Var.get(); self.wx = -1.0
         elif self.IniM_Var.get() != 'Lambda_':
-            run_type = self.IniM_Var.get()
+            run_type = self.IniM_Var.get(); self.wx = -1.0
         elif self.MG_Var.get() != 'Lambda_':
-            run_type = self.MG_Var.get()
+            run_type = self.MG_Var.get(); self.wx = -1.0
         else:
             run_type = 'Lambda_'; self.wx = -1.0
 
@@ -450,11 +460,19 @@ class Application(Frame):
         return model
 
     def save_movie(self):
-        writer = animation.writers['ffmpeg'](fps=15)
+        writer = animation.writers('ffmpeg')(fps=15)
         self.ani.save(CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
 
+    def Main_destory(self):
+        self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
+
+    def Main_recreate(self, event):
+        self.initialize(); self.Sim_Create()
+
     def start(self):
-        self.frames = 0; self.maxframes = 0
+        self.progress_var.set(0); self.frames = 0; self.maxframes = 0
+        
+        
         Simu_Dir = "/BBF/"+self.model_select()+"/Dens-Maps/"
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
         filenames=sorted(glob.glob(CWD + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
@@ -462,33 +480,31 @@ class Application(Frame):
         def animate(filename):
             image = np.load(filename); indx = filenames.index(filename) #; image=ndim.gaussian_filter(image,sigma=sys.argv[2],mode='wrap')
             im.set_data(image + 1)#; im.set_clim(image.min()+1.,image.max()+1.)
-            self.time.set_text('Age of the Universe: %s Gyr' %round(lktime[indx],3))
+            self.time.set_text('LookBack Time: %s Gyr' %round(lktime[indx], 4))
             return im
 
         dens_map = load(filenames[0]); dens_map0 = load(filenames[-1]); print dens_map0.min()+1, dens_map0.max()+1.
-        im = self.ax1.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
+        im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
-        self.ax1.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
-        self.time = self.ax1.text(0.15, 0.1 , 'Age of the Universe: %s Gyr' %round(lktime[0],3), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax1.transAxes, fontsize=10)
+        self.ax.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        self.time = self.ax.text(0.15, 0.1 , 'LookBack Time: %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
         arr_hand = mpimg.imread(CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
         imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(30., -40.), xycoords='data', boxcoords="offset points", pad=0.1)
-        self.ax1.add_artist(ab)
+        self.ax.add_artist(ab)
 
         #iMpc = lambda x: x*1024/125  #x in Mpc, return in Pixel *3.085e19
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
-        self.ax1.add_artist(ob)
+        self.ax.add_artist(ob)
 
-        self.canvas.mpl_connect('button_press_event', self.onClick)
-        self.ani = animation.FuncAnimation(self.f, animate, filenames, repeat=False, interval=25, blit=False)
-        self.ax1.axis('off'); self.canvas.show()
+        #self.canvas.mpl_connect('button_press_event', self.onClick)
+        self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
+        self.ax.axis('off'); self.canvas.show()
 
-        self.progress["value"] = 0
-        self.maxframes = 300
-        self.progress["maximum"] = 300
+        self.progress["value"] = 0; self.maxframes = 300; self.progress["maximum"] = 300
         self.read_frames()
 
     def read_frames(self):
@@ -496,7 +512,7 @@ class Application(Frame):
         #self.progress["value"] = self.frames
         self.progress_var.set(self.frames)
         if self.frames < self.maxframes:
-            self.after(25, self.read_frames)
+            self._job1 = self.after(25, self.read_frames)
 
     def open_cam(self):
         # if self._job is not None:
@@ -513,7 +529,7 @@ class Application(Frame):
 
         self.img = Image.fromarray(self.cv2image)
 
-        self.lmain = self.ax1.imshow(self.img); self.canvas.show(); self.ax1.clear(); self.ax1.axis('off')
+        self.lmain = self.ax.imshow(self.img); self.canvas.show(); self.ax.clear(); self.ax.axis('off')
         self._job = self.after(25, self.show_frame)
         #print self._job
 
@@ -541,14 +557,18 @@ class Application(Frame):
 
     def models_refresh(self, *args):
         #return None
-        if self.Lambda_Var.get() != 'Lambda_':#  or self.MG_Var.get() != 'Lambda_' or self.IniM_Var.get() != 'Lambda_' or self.CDM_Var.get() != 'Lambda_':
+        if self.Lambda_Var.get() != 'Lambda_':
             self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
-        elif self.CDM_Var.get() != 'Lambda_':# or self.Lambda_Var.get() != 'Lambda_' or self.MG_Var.get() != 'Lambda_' or self.IniM_Var.get() != 'Lambda_':
+    def models_refresh1(self, *args):
+        if self.CDM_Var.get() != 'Lambda_':
             self.Lambda_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
-        elif self.IniM_Var.get() != 'Lambda_':# or self.MG_Var.get() != 'Lambda_' or self.Lambda_Var.get() != 'Lambda_' or self.CDM_Var.get() != 'Lambda_' :
+    def models_refresh2(self, *args):
+        if self.IniM_Var.get() != 'Lambda_':
             self.CDM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
-        elif self.MG_Var.get() != 'Lambda_':# or self.IniM_Var.get() != 'Lambda_' or self.Lambda_Var.get() != 'Lambda_' or self.CDM_Var.get() != 'Lambda_':
+    def models_refresh3(self, *args):
+        if self.MG_Var.get() != 'Lambda_':
             self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_')
+
 #        else:
 #            self.Lambda_Var.set('Lambda_')
 
