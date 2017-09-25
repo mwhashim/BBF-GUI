@@ -51,7 +51,7 @@ import pandas as pd
 import subprocess, shlex
 
 import ttk
-#import tkFileDialog, Tkconstants
+import tkFileDialog, Tkconstants
 #import tkinter.filedialog, tkinter.messagebox
 #
 if sys.version_info[0] < 3:
@@ -89,7 +89,7 @@ top = bottom + height
 
 #--- CWD -----
 #CWD = os.getcwd(); print CWD
-CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
+#CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
 
 class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
     """ size: length of bar in data units
@@ -128,7 +128,7 @@ class Application(Frame):
         self.welcome_screen(self.master)
             
     def goback(self):
-        self.Frame_1.grid_forget(); self.Frame_2.grid_forget(); self.Frame_3.grid_forget(); self.welcome_screen(self.master)
+        self.status.grid_forget(); self.Frame_1.grid_forget(); self.Frame_2.grid_forget(); self.Frame_3.grid_forget(); self.welcome_screen(self.master)
     
     def welcome_screen(self, frame):
         # Frame 0 :------------------------------------------------------
@@ -184,6 +184,7 @@ class Application(Frame):
         
         menu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=menu)
+        menu.add_command(label="Open", command=self.ModelDirectory)
         menu.add_command(label="New", command=self.run_reset)
         menu.add_command(label="Save", command=self.save_movie)
         menu.add_command(label="Go Back", command=self.goback)
@@ -462,7 +463,7 @@ class Application(Frame):
 
     def save_movie(self):
         writer = animation.writers('ffmpeg')(fps=15)
-        self.ani.save(CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
+        self.ani.save(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -476,7 +477,7 @@ class Application(Frame):
         
         Simu_Dir = "/BBF/"+self.model_select()+"/Dens-Maps/"
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
-        filenames=sorted(glob.glob(CWD + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
+        filenames=sorted(glob.glob(self.CWD + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
 
         def animate(filename):
             image = np.load(filename); indx = filenames.index(filename) #; image=ndim.gaussian_filter(image,sigma=sys.argv[2],mode='wrap')
@@ -491,7 +492,7 @@ class Application(Frame):
         self.time = self.ax.text(0.15, 0.1 , 'LookBack Time: %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
-        arr_hand = mpimg.imread(CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
+        arr_hand = mpimg.imread(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
         imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(30., -40.), xycoords='data', boxcoords="offset points", pad=0.1)
@@ -540,12 +541,12 @@ class Application(Frame):
             return None
 
         try:
-            os.stat(CWD + "/users_photo/")
+            os.stat(self.CWD + "/users_photo/")
         except:
-            os.mkdir(CWD + "/users_photo/")
+            os.mkdir(self.CWD + "/users_photo/")
 
         self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
-        self.img.save(CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
+        self.img.save(self.CWD + "/users_photo/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
         #----: CAM stop
         if self._job is not None:
             self.after_cancel(self._job)
@@ -570,8 +571,10 @@ class Application(Frame):
         if self.MG_Var.get() != 'Lambda_':
             self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_')
 
-#        else:
-#            self.Lambda_Var.set('Lambda_')
+
+    def ModelDirectory(self):
+        self.modeldirname = tkFileDialog.askdirectory(parent=root, initialdir='/Users/mahmoud/')
+        self.CWD = self.modeldirname
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
