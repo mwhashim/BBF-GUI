@@ -205,15 +205,22 @@ class Application(Frame):
         self.run.pack(side="left")
 
     def PlotPan(self, frame):
-        fig = plt.Figure()
-        ax = fig.add_subplot(111); ax.axis('off'); fig.set_tight_layout(True) # fig.tight_layout()
+#        self.f, (ax1, ax2) = subplots(2, sharex=True)
+#        self.gs = gridspec.GridSpec(2,1, height_ratios=[3,1])
+#        self.ax1 = subplot(self.gs[0]); #self.ax2 = subplot(gs[1])
+#        #self.ax3 = axes([.16, .35, .3, .3])
+#        self.f.subplots_adjust(hspace=0)#; self.f.tight_layout()
 
-        canvas = FigureCanvasTkAgg(fig, master = frame)
+        self.f = plt.Figure()
+        self.ax1 = self.f.add_subplot(111); self.ax1.axis('off')
+        self.f.tight_layout()
+
+        self.canvas = FigureCanvasTkAgg(self.f, master = frame)
         #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
-        #canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
-        #canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
-        return fig, ax, canvas
+        self.canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
+        self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
+        self.canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
+
     def MainFrame(self, frame):
 
         #------------------------
