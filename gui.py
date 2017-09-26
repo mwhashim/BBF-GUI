@@ -95,6 +95,15 @@ top = bottom + height
 CWD = os.getcwd()#; print CWD
 #CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
 
+def center(toplevel):
+    toplevel.update_idletasks()
+    w = toplevel.winfo_screenwidth()
+    h = toplevel.winfo_screenheight()
+    size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+    x = w/2 - size[0]/2
+    y = h/2 - size[1]/2
+    toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
+
 class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
     """ size: length of bar in data units
         extent : height of bar ends in axes units """
@@ -202,6 +211,10 @@ class Application(Frame):
         menu2 = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Pipeline", menu=menu2)
         menu2.add_command(label="Open", command=self.ModelDirectory)
+        
+        menu3 = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Settings", menu=menu3)
+        menu3.add_command(label="Email", command=self.myDialog)
         
         self.master.config(menu=self.menubar)
 
@@ -485,7 +498,7 @@ class Application(Frame):
         self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
     
     def send_movie(self):
-        emailling(self.Email_Var.get(), self.savedir, self.Name_Var.get().split()[-1] + "'s_movie.mp4")
+        emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "'s_movie.mp4")
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -611,6 +624,34 @@ class Application(Frame):
         self.Background_photo = ImageTk.PhotoImage(self.original.resize(size, Image.ANTIALIAS))
         self.Welcome_Frame.delete("IMG")
         self.Welcome_Frame.create_image(0, 0, image = self.Background_photo, anchor=NW, tags="IMG")
+
+
+
+    def myDialog(self):
+        Entry_dialog = Toplevel(self.master); Entry_dialog.title("Email Credentials")#; center(Entry_dialog)
+        
+        for x in range(2):
+            Grid.columnconfigure(Entry_dialog, x, weight=2)
+        
+        for y in range(3):
+            Grid.rowconfigure(Entry_dialog, y, weight=2)
+        
+        Label(Entry_dialog, text="Email").grid(row=0, column=0, sticky= W)
+        self.UserName_Var = StringVar()
+        self.UserName = Entry(Entry_dialog, textvariable=self.UserName_Var)
+        self.UserName.grid(row=0, column=1, sticky= W+E+N+S)
+        
+        Label(Entry_dialog, text="Password").grid(row=1, column=0, sticky= W)
+        self.PassWord_Var = StringVar()
+        self.PassWord = Entry(Entry_dialog, textvariable=self.PassWord_Var, show="*")
+        self.PassWord.grid(row=1, column=1, sticky= W+E+N+S)
+
+        def getDate():
+            self.From = self.UserName_Var.get(); self.PWD =self.PassWord_Var.get()
+            Entry_dialog.destroy() # close the window
+        
+        submit = Button(Entry_dialog, text ="Submit", command = getDate)
+        submit.grid(row=3, column=0,columnspan=2, sticky= W+E+N+S)
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
