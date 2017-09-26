@@ -72,6 +72,7 @@ from PIL import Image, ImageTk
 #from CosmoSuite import *
 
 from astropy.cosmology import wCDM
+from astropy.io import fits
 
 from emailling import *
 
@@ -443,19 +444,80 @@ class Application(Frame):
 
         for y in range(2):
             Grid.rowconfigure(self.Control_Frame, y, weight=2)
+        
+        self.Simulation_group = LabelFrame(self.Control_Frame, text = "N-Body Simulation")
+        self.Simulation_group.grid(row = 0, column = 0, columnspan = 4, sticky = W+E+N+S)
 
-        Grid.rowconfigure(self.Control_Frame, 0, weight=0)
-        self.Simulation_Run = Button(self.Control_Frame, text = u"Simulation Run", foreground = 'red', command = self.start)
+        #Grid.rowconfigure(self.NewRun_page, 0, weight=0)
+
+        for x in range(6):
+            Grid.columnconfigure(self.Simulation_group, x, weight=2)
+        for y in range(2):
+            Grid.rowconfigure(self.Simulation_group, y, weight=2)
+
+        Grid.rowconfigure(self.Simulation_group, 0, weight=0)
+        self.Simulation_Run = Button(self.Simulation_group, text = u"Simulation Run", foreground = 'red', command = self.start)
         self.Simulation_Run.grid(column = 0, row = 0, pady = 5, sticky= W+E+N+S)
 
         self.progress_var = DoubleVar()
-        self.progress = ttk.Progressbar(self.Control_Frame, variable=self.progress_var,  orient="horizontal", length=300, mode="determinate")
+        self.progress = ttk.Progressbar(self.Simulation_group, variable=self.progress_var,  orient="horizontal", length=300, mode="determinate")
         self.progress.grid(column = 0, row = 1, pady = 5, sticky= W+E+N+S, columnspan = 6)
+
+
+        self.Lensing_group = LabelFrame(self.Control_Frame, text = "Gravitational Lensing")
+        self.Lensing_group.grid(row = 1, column = 0, columnspan = 4, sticky = W+E+N+S)
+        
+        #Grid.rowconfigure(self.NewRun_page, 0, weight=0)
+        
+        for x in range(4):
+            Grid.columnconfigure(self.Lensing_group, x, weight=2)
+        for y in range(5):
+            Grid.rowconfigure(self.Lensing_group, y, weight=2)
+
+        self.Sow_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Map", command = self.showlensMap)
+        self.Sow_Lensing_Map.grid(row=0, column=0, sticky= W)
+            
+        self.Sow_Lensing_User = Button(self.Lensing_group, text="Map Lens User's Face")#, command = self.showlensMap)
+        self.Sow_Lensing_User.grid(row=0, column=1, sticky= W)
+
+        self.Halo_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Cluster", command = self.showlenscluster)
+        self.Halo_Lensing_Map.grid(row=1, column=0, sticky= W)
+        
+        self.Halo_Lensing_User = Button(self.Lensing_group, text="Cluster Lens User's Face")#, command = self.showlensMap)
+        self.Halo_Lensing_User.grid(row=1, column=1, sticky= W)
+        
+        Label(self.Lensing_group, text="Source-Lens Distance:", justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
+            
+        self.ComvDist_Var= DoubleVar()
+        #self.ComvDist_Var.trace("w", self.callback_NBodyTrace)
+        self.ComvDist=Scale(self.Lensing_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=300, variable = self.ComvDist_Var, digits=3)
+        self.ComvDist.grid(row=3, column=0, sticky= W+E+N+S, pady = 5, columnspan = 4)
+    
+    
+#        self.Name_Var = StringVar()
+#        self.User_Name = Entry(self.Name_Dict_group, textvariable=self.Name_Var)
+#        self.User_Name.grid(row=0, column=1, sticky= W+E+N+S,  columnspan = 6)
+#            
+        #self.name_Var.set(None)
+
 
 #
 #        self.Run_Dict = {'Lambda_': 'Constant', 'Quint_': 'Quintessence', 'Phantom_': 'Phantom',
 #                        'LocalPNG_1000-': ''}
 
+
+    def showlensMap(self):
+        Simu_Dir = self.model_select()+"/Lens-Maps/"
+        filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; Lens_map = fits.getdata(filename, ext=0)
+        LenImg = self.ax.imshow(Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+    
+    def showlenscluster(self):
+        Simu_Dir = self.model_select()+"/Lens-Maps/"
+        filename = self.simdir + "/" + Simu_Dir + self.model_name +'_halo.fits'; Halo_map = fits.getdata(filename, ext=0)
+        HaloImg = self.ax.imshow(Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+    
     def run_reset(self):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
         self.Name_Var.set(''); self.Email_Var.set(''); self.Omega_m_Var.set(0.0); self.Omega_l_Var.set(0.0)
@@ -488,6 +550,7 @@ class Application(Frame):
             Omega_m = str(self.Omega_m_Var.get())
 
         model  = "BBF_" + run_type + Omega_m + "-" + str(self.Omega_l_Var.get())
+        self.model_name = run_type + Omega_m + "-" + str(self.Omega_l_Var.get())
         print model
 
         return model
