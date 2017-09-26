@@ -13,6 +13,8 @@ import Queue
 import time
 
 from numpy import *
+from scipy import ndimage
+
 import decimal
 from collections import *
 
@@ -92,9 +94,37 @@ bottom, height = .25, .5
 right = left + width
 top = bottom + height
 
+sigmaval = 1.; truncateval = 3.
+
 #--- CWD -----
 CWD = os.getcwd()#; print CWD
 #CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
+
+def deflect(image_arr,image_data1,image_data2,xsize,ysize):
+    
+    ds = 1156.34008206061
+    dl = 564.558513269509
+    dls = 803.491011267171
+    
+    f = ds/dl/dls/xsize*2.5e8
+    
+    lensed_data = copy.copy(image_arr)
+    #print xsize, ysize
+    for i in range(0,xsize):
+        for j in range(0,ysize):
+            ii = i - image_data2[i][j]*f + 0.5
+            if int(ii) >= xsize:
+                ii = int(ii - xsize)
+            if int(ii) < -0.5:
+                ii = int(ii + xsize)
+            jj = j - image_data1[i][j]*f + 0.5
+            if int(jj) >= ysize:
+                jj = int(jj - ysize)
+            if int(jj) < -0.5:
+                jj = int(jj + ysize)
+            lensed_data[i][j] = image_arr[int(ii),int(jj)]
+
+    return lensed_data
 
 def center(toplevel):
     toplevel.update_idletasks()
@@ -505,14 +535,29 @@ class Application(Frame):
 #        self.Run_Dict = {'Lambda_': 'Constant', 'Quint_': 'Quintessence', 'Phantom_': 'Phantom',
 #                        'LocalPNG_1000-': ''}
 
+    def HaloLensedImage(self):
+        self.ax.clear(); self.ax.axis('off')
+        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
+        
+        Simu_Dir = self.model_select()+"/Lens-Maps/"
+        filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_halo.fits'
+        
+        image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
+        
+        alpha1, alpha2 = buildlens(filelens,0.3,0.7,0.7,0.25,1296.03021434336)
+        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize); self.ax.imshow(lensedimage)
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+
 
     def showlensMap(self):
+        self.ax.clear(); self.ax.axis('off')
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; Lens_map = fits.getdata(filename, ext=0)
         LenImg = self.ax.imshow(Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
     
     def showlenscluster(self):
+        self.ax.clear(); self.ax.axis('off')
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'_halo.fits'; Halo_map = fits.getdata(filename, ext=0)
         HaloImg = self.ax.imshow(Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
@@ -578,12 +623,12 @@ class Application(Frame):
         filenames=sorted(glob.glob(self.simdir + "/" + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
 
         def animate(filename):
-            image = np.load(filename); indx = filenames.index(filename) #; image=ndim.gaussian_filter(image,sigma=sys.argv[2],mode='wrap')
+            image = np.load(filename); indx = filenames.index(filename)#; image=ndimage.gaussian_filter(image, sigma= sigmaval, truncate=truncateval, mode='wrap')
             im.set_data(image + 1)#; im.set_clim(image.min()+1.,image.max()+1.)
             self.time.set_text('LookBack Time: %s Gyr' %round(lktime[indx], 4))
             return im
 
-        dens_map = load(filenames[0]); dens_map0 = load(filenames[-1]); print dens_map0.min()+1, dens_map0.max()+1.
+        dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
         im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
         self.ax.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
