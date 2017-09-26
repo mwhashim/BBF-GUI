@@ -79,6 +79,8 @@ from astropy.io import fits
 
 from emailling import *
 
+from textdictENG import text_dict
+
 #----------------------------------
 def destroy(e): sys.exit()
 
@@ -179,7 +181,7 @@ class Application(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.grid()
-        self.master.title("Big Bang Factory")
+        self.master.title(text_dict['t1'])#("Big Bang Factory")
 
         #---------------------------------------
         for r in range(7):
@@ -208,7 +210,7 @@ class Application(Frame):
         self.Welcome_Frame.pack(side=TOP, fill=BOTH, expand=1)
         self.Frame_0.bind("<Configure>", self.resize)
         
-        Welcome_buttom = Button(self.Frame_0, text=u"Click to Create Your Universe", command=self.Sim_Create)
+        Welcome_buttom = Button(self.Frame_0, text=text_dict['t3'], command=self.Sim_Create)
         Welcome_buttom.pack()
         
         #---------------------------------------
@@ -230,7 +232,7 @@ class Application(Frame):
         self.statusVariable = StringVar()
         self.status = Label(self.master, textvariable = self.statusVariable, anchor = "w", fg = "yellow", bg = "blue")
         self.status.grid(column = 0, row = 7,columnspan = 7, sticky = 'EWS')
-        self.statusVariable.set(u"Welcome to Big Bang Factory")
+        self.statusVariable.set(text_dict['t2'])#(u"Welcome to Big Bang Factory")
 
 #        # Frame 1 :------------------------------------------------------
 #        self.Frame_1 = PanedWindow(self.master, bg="white smoke")
@@ -251,21 +253,21 @@ class Application(Frame):
         self.menubar = Menu(self.master)
         
         menu1 = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Main", menu=menu1)
-        menu1.add_command(label="New", command=self.run_reset)
-        menu1.add_command(label="Save", command=self.save_movie)
-        menu1.add_command(label="Send", command=self.send_movie)
-        menu1.add_command(label="Go Back", command=self.goback)
+        self.menubar.add_cascade(label=text_dict['t4'], menu=menu1)
+        menu1.add_command(label=text_dict['t5'], command=self.run_reset)
+        menu1.add_command(label=text_dict['t6'], command=self.save_movie)
+        menu1.add_command(label=text_dict['t7'], command=self.send_movie)
+        menu1.add_command(label=text_dict['t8'], command=self.goback)
         menu1.add_separator()
-        menu1.add_command(label="Exit", command=root.quit)
+        menu1.add_command(label=text_dict['t9'], command=root.quit)
         
         menu2 = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Pipeline", menu=menu2)
-        menu2.add_command(label="Open", command=self.ModelDirectory)
+        self.menubar.add_cascade(label=text_dict['t10'], menu=menu2)
+        menu2.add_command(label=text_dict['t11'], command=self.ModelDirectory)
         
         menu3 = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Settings", menu=menu3)
-        menu3.add_command(label="Email", command=self.myDialog)
+        self.menubar.add_cascade(label=text_dict['t12'], menu=menu3)
+        menu3.add_command(label=text_dict['t13'], command=self.myDialog)
         
         self.master.config(menu=self.menubar)
 
@@ -338,7 +340,7 @@ class Application(Frame):
         for y in range(6):
             Grid.rowconfigure(self.NewRun_page, y, weight=2)
 
-        self.Name_Dict_group = LabelFrame(self.NewRun_page, text = "User Specifications")
+        self.Name_Dict_group = LabelFrame(self.NewRun_page, text = text_dict['t14'])
         self.Name_Dict_group.grid(row = 0, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 0, weight=0)
 
@@ -347,25 +349,25 @@ class Application(Frame):
         for y in range(2):
             Grid.rowconfigure(self.Name_Dict_group, y, weight=2)
 
-        Label(self.Name_Dict_group, text="Name").grid(row=0, column=0, sticky= W)
+        Label(self.Name_Dict_group, text=text_dict['t15']).grid(row=0, column=0, sticky= W)
         self.Name_Var = StringVar()
         self.User_Name = Entry(self.Name_Dict_group, textvariable=self.Name_Var)
         self.User_Name.grid(row=0, column=1, sticky= W+E+N+S,  columnspan = 6)
         #self.name_Var.set(None)
 
-        Label(self.Name_Dict_group, text="Email").grid(row=1, column=0, sticky= W)
+        Label(self.Name_Dict_group, text=text_dict['t16']).grid(row=1, column=0, sticky= W)
         self.Email_Var = StringVar()
         self.User_Email = Entry(self.Name_Dict_group, textvariable=self.Email_Var)
         self.User_Email.grid(row=1, column=1, sticky= W+E+N+S,  columnspan = 6)
         #self.Email_Var.set(None)
 
-        self.Image_button = Button(self.Name_Dict_group, text="Show CAM", command = self.open_cam)
+        self.Image_button = Button(self.Name_Dict_group, text=text_dict['t17'], command = self.open_cam)
         self.Image_button.grid(row = 2, column = 2, columnspan = 1 , sticky = W+E+N+S, pady = 5)
 
-        self.click_button = Button(self.Name_Dict_group, text="Take Photo", command = self.saveImage)
+        self.click_button = Button(self.Name_Dict_group, text=text_dict['t18'], command = self.saveImage)
         self.click_button.grid(row = 2, column = 3, columnspan = 1 , sticky = W+E+N+S, pady = 5)
 
-        self.Cosmo_Parms_group = LabelFrame(self.NewRun_page, text = "Cosmological Parameters")
+        self.Cosmo_Parms_group = LabelFrame(self.NewRun_page, text = text_dict['t19'])
         self.Cosmo_Parms_group.grid(row = 1, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 1, weight=0)
 
@@ -401,7 +403,7 @@ class Application(Frame):
         self.Omega_m.grid(row=1, column=1, sticky= W+E+N+S, pady = 5, columnspan = 3)
 
 
-        self.DarkEnergy_group = LabelFrame(self.NewRun_page, text = "Dark Energy Type")
+        self.DarkEnergy_group = LabelFrame(self.NewRun_page, text = text_dict['t20'])
         self.DarkEnergy_group.grid(row = 2, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 1, weight=0)
 
@@ -414,17 +416,17 @@ class Application(Frame):
 
         self.Lambda_Var = StringVar()
         self.Lambda_Var.trace('w', self.models_refresh)
-        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = 'Constant', variable = self.Lambda_Var, value = 'Lambda_')
+        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = text_dict['t21'], variable = self.Lambda_Var, value = 'Lambda_')
         self.Lambda_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = 'Quintessence', variable = self.Lambda_Var, value = 'Quint_')
+        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = text_dict['t22'], variable = self.Lambda_Var, value = 'Quint_')
         self.Lambda_RadBtt.grid(row = 0, column = 1, sticky = W)
 
-        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = 'Phantom', variable = self.Lambda_Var, value = 'Phantom_')
+        self.Lambda_RadBtt = Radiobutton(self.DarkEnergy_group, text = text_dict['t23'], variable = self.Lambda_Var, value = 'Phantom_')
         self.Lambda_RadBtt.grid(row = 0, column = 2, sticky = W)
         self.Lambda_Var.set('Lambda_')
 
-        self.DarkMatter_group = LabelFrame(self.NewRun_page, text = "Dark Matter Type")
+        self.DarkMatter_group = LabelFrame(self.NewRun_page, text = text_dict['t24'])
         self.DarkMatter_group.grid(row = 3, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 1, weight=0)
 
@@ -436,14 +438,14 @@ class Application(Frame):
 
         self.CDM_Var = StringVar()
         self.CDM_Var.trace('w', self.models_refresh1)
-        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = 'Cold', variable = self.CDM_Var, value = 'Lambda_')
+        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = text_dict['t25'], variable = self.CDM_Var, value = 'Lambda_')
         self.CDM_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = 'Warm', variable = self.CDM_Var, value = 'wDM_0.5-')
+        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = text_dict['t26'], variable = self.CDM_Var, value = 'wDM_0.5-')
         self.CDM_RadBtt.grid(row = 0, column = 1, sticky = W)
         self.CDM_Var.set('Lambda_')
 
-        self.IniMatter_group = LabelFrame(self.NewRun_page, text = "Initial Matter Distribution")
+        self.IniMatter_group = LabelFrame(self.NewRun_page, text = text_dict['t27'])
         self.IniMatter_group.grid(row = 4, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 1, weight=0)
 
@@ -455,17 +457,17 @@ class Application(Frame):
 
         self.IniM_Var = StringVar()
         self.IniM_Var.trace('w', self.models_refresh2)
-        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = 'Gaussian', variable = self.IniM_Var, value = 'Lambda_')
+        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = text_dict['t28'], variable = self.IniM_Var, value = 'Lambda_')
         self.IniM_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = 'Positive non-Gaussian', variable = self.IniM_Var, value = 'LocalPNG_1000-')
+        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = text_dict['t29'], variable = self.IniM_Var, value = 'LocalPNG_1000-')
         self.IniM_RadBtt.grid(row = 0, column = 1, sticky = W)
 
-        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = 'Negative non-Gaussian', variable = self.IniM_Var, value = 'LocalPNG_-1000-')
+        self.IniM_RadBtt = Radiobutton(self.IniMatter_group, text = text_dict['t30'], variable = self.IniM_Var, value = 'LocalPNG_-1000-')
         self.IniM_RadBtt.grid(row = 0, column = 2, sticky = W)
         self.IniM_Var.set('Lambda_')
 
-        self.MG_group = LabelFrame(self.NewRun_page, text = "Gravity Type")
+        self.MG_group = LabelFrame(self.NewRun_page, text = text_dict['t31'])
         self.MG_group.grid(row = 5, column = 0, columnspan = 6, sticky = W+E+N+S)
         Grid.rowconfigure(self.NewRun_page, 1, weight=0)
 
@@ -477,10 +479,10 @@ class Application(Frame):
 
         self.MG_Var = StringVar()
         self.MG_Var.trace('w', self.models_refresh3)
-        self.MG_RadBtt = Radiobutton(self.MG_group, text = 'Einstein', variable = self.MG_Var, value = 'Lambda_')
+        self.MG_RadBtt = Radiobutton(self.MG_group, text = text_dict['t32'], variable = self.MG_Var, value = 'Lambda_')
         self.MG_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.MG_RadBtt = Radiobutton(self.MG_group, text = 'Modified Garvity', variable = self.MG_Var, value = 'MGfR_-1e-04-')
+        self.MG_RadBtt = Radiobutton(self.MG_group, text = text_dict['t33'], variable = self.MG_Var, value = 'MGfR_-1e-04-')
         self.MG_RadBtt.grid(row = 0, column = 1, sticky = W)
         self.MG_Var.set('Lambda_')
 
@@ -495,7 +497,7 @@ class Application(Frame):
         for y in range(2):
             Grid.rowconfigure(self.Control_Frame, y, weight=2)
         
-        self.Simulation_group = LabelFrame(self.Control_Frame, text = "N-Body Simulation")
+        self.Simulation_group = LabelFrame(self.Control_Frame, text = text_dict['t34'])
         self.Simulation_group.grid(row = 0, column = 0, columnspan = 4, sticky = W+E+N+S)
 
         #Grid.rowconfigure(self.NewRun_page, 0, weight=0)
@@ -506,7 +508,7 @@ class Application(Frame):
             Grid.rowconfigure(self.Simulation_group, y, weight=2)
 
         Grid.rowconfigure(self.Simulation_group, 0, weight=0)
-        self.Simulation_Run = Button(self.Simulation_group, text = u"Simulation Run", foreground = 'red', command = self.start)
+        self.Simulation_Run = Button(self.Simulation_group, text = text_dict['t35'], foreground = 'red', command = self.start)
         self.Simulation_Run.grid(column = 0, row = 0, pady = 5, sticky= W+E+N+S)
 
         self.progress_var = DoubleVar()
@@ -514,7 +516,7 @@ class Application(Frame):
         self.progress.grid(column = 0, row = 1, pady = 5, sticky= W+E+N+S, columnspan = 6)
 
 
-        self.Lensing_group = LabelFrame(self.Control_Frame, text = "Gravitational Lensing")
+        self.Lensing_group = LabelFrame(self.Control_Frame, text = text_dict['t36'])
         self.Lensing_group.grid(row = 1, column = 0, columnspan = 4, sticky = W+E+N+S)
         
         #Grid.rowconfigure(self.NewRun_page, 0, weight=0)
@@ -524,19 +526,19 @@ class Application(Frame):
         for y in range(5):
             Grid.rowconfigure(self.Lensing_group, y, weight=2)
 
-        self.Sow_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Map", command = self.showlensMap)
+        self.Sow_Lensing_Map = Button(self.Lensing_group, text=text_dict['t37'], command = self.showlensMap)
         self.Sow_Lensing_Map.grid(row=0, column=0, sticky= W)
             
-        self.Sow_Lensing_User = Button(self.Lensing_group, text="Map Lens User's Face", command = self.MapLensedImage)
+        self.Sow_Lensing_User = Button(self.Lensing_group, text=text_dict['t38'], command = self.MapLensedImage)
         self.Sow_Lensing_User.grid(row=0, column=1, sticky= W)
 
-        self.Halo_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Cluster", command = self.showlenscluster)
+        self.Halo_Lensing_Map = Button(self.Lensing_group, text=text_dict['t39'], command = self.showlenscluster)
         self.Halo_Lensing_Map.grid(row=1, column=0, sticky= W)
         
-        self.Halo_Lensing_User = Button(self.Lensing_group, text="Cluster Lens User's Face", command = self.HaloLensedImage)
+        self.Halo_Lensing_User = Button(self.Lensing_group, text=text_dict['t40'], command = self.HaloLensedImage)
         self.Halo_Lensing_User.grid(row=1, column=1, sticky= W)
         
-        Label(self.Lensing_group, text="Source-Lens Distance:", justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
+        Label(self.Lensing_group, text=text_dict['t41'], justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
             
         self.ComvDist_Var= DoubleVar()
         #self.ComvDist_Var.trace("w", self.callback_NBodyTrace)
@@ -664,8 +666,8 @@ class Application(Frame):
         dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
         im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
-        self.ax.annotate("This is the Universe by " + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
-        self.time = self.ax.text(0.15, 0.1 , 'LookBack Time: %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
+        self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        self.time = self.ax.text(0.15, 0.1 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
         arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
@@ -699,7 +701,7 @@ class Application(Frame):
         # if self._job is not None:
         #     return None
         if not self.Name_Var.get():
-            self.statusVariable.set(u"Please Enter Your Name !!")
+            self.statusVariable.set(text_dict['t44'])
             return None
         self.show_frame()
 
@@ -716,7 +718,7 @@ class Application(Frame):
 
     def saveImage(self):
         if not self.Name_Var.get():
-            self.statusVariable.set(u"Please Enter Your Name !!")
+            self.statusVariable.set(text_dict['t44'])
             return None
 
         try:
@@ -769,7 +771,7 @@ class Application(Frame):
 
 
     def myDialog(self):
-        Entry_dialog = Toplevel(self.master); Entry_dialog.title("Email Credentials")#; center(Entry_dialog)
+        Entry_dialog = Toplevel(self.master); Entry_dialog.title(text_dict['t45'])#; center(Entry_dialog)
         
         for x in range(2):
             Grid.columnconfigure(Entry_dialog, x, weight=2)
@@ -777,12 +779,12 @@ class Application(Frame):
         for y in range(3):
             Grid.rowconfigure(Entry_dialog, y, weight=2)
         
-        Label(Entry_dialog, text="Email").grid(row=0, column=0, sticky= W)
+        Label(Entry_dialog, text=text_dict['t46']).grid(row=0, column=0, sticky= W)
         self.UserName_Var = StringVar()
         self.UserName = Entry(Entry_dialog, textvariable=self.UserName_Var)
         self.UserName.grid(row=0, column=1, sticky= W+E+N+S)
         
-        Label(Entry_dialog, text="Password").grid(row=1, column=0, sticky= W)
+        Label(Entry_dialog, text=text_dict['t47']).grid(row=1, column=0, sticky= W)
         self.PassWord_Var = StringVar()
         self.PassWord = Entry(Entry_dialog, textvariable=self.PassWord_Var, show="*")
         self.PassWord.grid(row=1, column=1, sticky= W+E+N+S)
@@ -791,7 +793,7 @@ class Application(Frame):
             self.From = self.UserName_Var.get(); self.PWD =self.PassWord_Var.get()
             Entry_dialog.destroy() # close the window
         
-        submit = Button(Entry_dialog, text ="Submit", command = getDate)
+        submit = Button(Entry_dialog, text =text_dict['t48'], command = getDate)
         submit.grid(row=3, column=0,columnspan=2, sticky= W+E+N+S)
 
 #--------- RUN ----------------------------
