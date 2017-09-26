@@ -7,7 +7,7 @@ from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 
 def emailling(To, FilePath, FileName):
-    From = 'hashim.mahmoud84@gmail.com'
+    From = ''
     file = FilePath + "/" + FileName
 
 
@@ -24,7 +24,7 @@ def emailling(To, FilePath, FileName):
     try:
         smtp = smtplib.SMTP('smtp.gmail.com:587')
         smtp.starttls()
-        smtp.login('hashim.mahmoud84@gmail.com', 'wahbahashim84')
+        smtp.login('', '')
     except:
         i = 1
     else:

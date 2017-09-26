@@ -190,15 +190,19 @@ class Application(Frame):
     def Menubar(self):
         self.menubar = Menu(self.master)
         
-        menu = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="File", menu=menu)
-        menu.add_command(label="Open", command=self.ModelDirectory)
-        menu.add_command(label="New", command=self.run_reset)
-        menu.add_command(label="Save", command=self.save_movie)
-        menu.add_command(label="Send", command=self.send_movie)
-        menu.add_command(label="Go Back", command=self.goback)
-        menu.add_command(label="Exit", command=root.quit)
-        menu.add_separator()
+        menu1 = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Main", menu=menu1)
+        menu1.add_command(label="New", command=self.run_reset)
+        menu1.add_command(label="Save", command=self.save_movie)
+        menu1.add_command(label="Send", command=self.send_movie)
+        menu1.add_command(label="Go Back", command=self.goback)
+        menu1.add_separator()
+        menu1.add_command(label="Exit", command=root.quit)
+        
+        menu2 = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Pipeline", menu=menu2)
+        menu2.add_command(label="Open", command=self.ModelDirectory)
+        
         self.master.config(menu=self.menubar)
 
     def Toolbar(self, frame):
@@ -435,6 +439,9 @@ class Application(Frame):
         self.progress = ttk.Progressbar(self.Control_Frame, variable=self.progress_var,  orient="horizontal", length=300, mode="determinate")
         self.progress.grid(column = 0, row = 1, pady = 5, sticky= W+E+N+S, columnspan = 6)
 
+#
+#        self.Run_Dict = {'Lambda_': 'Constant', 'Quint_': 'Quintessence', 'Phantom_': 'Phantom',
+#                        'LocalPNG_1000-': ''}
 
     def run_reset(self):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
@@ -508,15 +515,18 @@ class Application(Frame):
 
 
         arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
-        imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
+        imagebox = OffsetImage(arr_hand, zoom=.05); xy = [0.30, 0.45] # coordinates to position this image
 
-        ab = AnnotationBbox(imagebox, xy, xybox=(30., -40.), xycoords='data', boxcoords="offset points", pad=0.1)
+        ab = AnnotationBbox(imagebox, xy, xybox=(40., -60.), xycoords='data', boxcoords="offset points", pad=0.1)
         self.ax.add_artist(ab)
 
         #iMpc = lambda x: x*1024/125  #x in Mpc, return in Pixel *3.085e19
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax.add_artist(ob)
-
+        
+        self.ax.text(0.7, 0.7, 'Universe Type: %s\nDark Energy Type: %s\nDark Matter Type: %s\nPrimordial Universe: %s\nGravity Type: %s' %('Flat', 'Constant', 'Cold', 'Natural', 'Einstein')
+                     , color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         #self.canvas.mpl_connect('button_press_event', self.onClick)
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
