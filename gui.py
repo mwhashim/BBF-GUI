@@ -115,7 +115,7 @@ def buildlens(filelens):
     return image_data1, image_data2
 
 
-def deflect(image_arr,image_data1,image_data2,xsize,ysize):
+def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac):
 #    
 #    for ll in range(0,len(zz)):\n",
 #        zs=zz[ll]\n",
@@ -124,7 +124,7 @@ def deflect(image_arr,image_data1,image_data2,xsize,ysize):
 #        dls = (np.array(cosmo.angular_diameter_distance(zs)*cosmo.H(0.)/100.)*(1+zs) - np.array(cosmo.angular_diameter_distance(zl)*cosmo.H(0.)/100.)*(1+zl))/(1+zs)
     ds = 1156.34008206061
     dl = 564.558513269509
-    dls = 803.491011267171
+    dls = 803.491011267171 + scalefac
     
     f = ds/dl/dls/xsize*2.5e8
     
@@ -527,7 +527,7 @@ class Application(Frame):
         self.Sow_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Map", command = self.showlensMap)
         self.Sow_Lensing_Map.grid(row=0, column=0, sticky= W)
             
-        self.Sow_Lensing_User = Button(self.Lensing_group, text="Map Lens User's Face")#, command = self.showlensMap)
+        self.Sow_Lensing_User = Button(self.Lensing_group, text="Map Lens User's Face", command = self.MapLensedImage)
         self.Sow_Lensing_User.grid(row=0, column=1, sticky= W)
 
         self.Halo_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Cluster", command = self.showlenscluster)
@@ -540,7 +540,7 @@ class Application(Frame):
             
         self.ComvDist_Var= DoubleVar()
         #self.ComvDist_Var.trace("w", self.callback_NBodyTrace)
-        self.ComvDist=Scale(self.Lensing_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=300, variable = self.ComvDist_Var, digits=3)
+        self.ComvDist=Scale(self.Lensing_group, from_=0.0, to=100.0, resolution=10.0, orient=HORIZONTAL, width=15, length=300, variable = self.ComvDist_Var, digits=2)
         self.ComvDist.grid(row=3, column=0, sticky= W+E+N+S, pady = 5, columnspan = 4)
     
     
@@ -555,6 +555,19 @@ class Application(Frame):
 #        self.Run_Dict = {'Lambda_': 'Constant', 'Quint_': 'Quintessence', 'Phantom_': 'Phantom',
 #                        'LocalPNG_1000-': ''}
 
+    def MapLensedImage(self):
+        self.ax.clear(); self.ax.axis('off')
+        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
+        
+        Simu_Dir = self.model_select()+"/Lens-Maps/"
+        filelens = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'
+        
+        image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
+        
+        alpha1, alpha2 = buildlens(filelens)
+        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(lensedimage)
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
         fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
@@ -565,7 +578,7 @@ class Application(Frame):
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
         alpha1, alpha2 = buildlens(filelens)
-        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize); self.ax.imshow(lensedimage)
+        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(lensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
 
 
@@ -579,7 +592,7 @@ class Application(Frame):
     def showlenscluster(self):
         self.ax.clear(); self.ax.axis('off')
         Simu_Dir = self.model_select()+"/Lens-Maps/"
-        filename = self.simdir + "/" + Simu_Dir + self.model_name +'_halo.fits'; Halo_map = fits.getdata(filename, ext=0)
+        filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; Halo_map = fits.getdata(filename, ext=0)
         HaloImg = self.ax.imshow(Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
     
