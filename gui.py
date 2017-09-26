@@ -3,6 +3,7 @@ import os, sys
 sys.setrecursionlimit(50000) # to solve maximum recursion depth exceeded error !!
 
 import shutil
+import copy
 
 import logging
 import glob
@@ -99,16 +100,35 @@ sigmaval = 1.; truncateval = 3.
 #--- CWD -----
 CWD = os.getcwd()#; print CWD
 #CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
+#-----------------------------
+def readimage(fileimage):
+    image = Image.open(fileimage)
+    xsize, ysize = image.size
+    return image, xsize, ysize
+
+def buildlens(filelens):
+    image_file1 = filelens + "_alpha1.fits"
+    hdu_list1 = fits.open(image_file1)
+    image_data1 = fits.getdata(image_file1)
+    image_file2 = filelens + "_alpha2.fits"
+    image_data2 = fits.getdata(image_file2)
+    return image_data1, image_data2
+
 
 def deflect(image_arr,image_data1,image_data2,xsize,ysize):
-    
+#    
+#    for ll in range(0,len(zz)):\n",
+#        zs=zz[ll]\n",
+#        dl = np.array(cosmo.angular_diameter_distance(zl)*cosmo.H(0.)/100.)
+#        ds = np.array(cosmo.angular_diameter_distance(zs)*cosmo.H(0.)/100.)
+#        dls = (np.array(cosmo.angular_diameter_distance(zs)*cosmo.H(0.)/100.)*(1+zs) - np.array(cosmo.angular_diameter_distance(zl)*cosmo.H(0.)/100.)*(1+zl))/(1+zs)
     ds = 1156.34008206061
     dl = 564.558513269509
     dls = 803.491011267171
     
     f = ds/dl/dls/xsize*2.5e8
     
-    lensed_data = copy.copy(image_arr)
+    lensed_data = copy(image_arr)
     #print xsize, ysize
     for i in range(0,xsize):
         for j in range(0,ysize):
@@ -513,7 +533,7 @@ class Application(Frame):
         self.Halo_Lensing_Map = Button(self.Lensing_group, text="Show Lensing Cluster", command = self.showlenscluster)
         self.Halo_Lensing_Map.grid(row=1, column=0, sticky= W)
         
-        self.Halo_Lensing_User = Button(self.Lensing_group, text="Cluster Lens User's Face")#, command = self.showlensMap)
+        self.Halo_Lensing_User = Button(self.Lensing_group, text="Cluster Lens User's Face", command = self.HaloLensedImage)
         self.Halo_Lensing_User.grid(row=1, column=1, sticky= W)
         
         Label(self.Lensing_group, text="Source-Lens Distance:", justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
@@ -540,11 +560,11 @@ class Application(Frame):
         fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
-        filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_halo.fits'
+        filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'
         
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
-        alpha1, alpha2 = buildlens(filelens,0.3,0.7,0.7,0.25,1296.03021434336)
+        alpha1, alpha2 = buildlens(filelens)
         lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize); self.ax.imshow(lensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
 
