@@ -680,8 +680,9 @@ class Application(Frame):
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax.add_artist(ob)
         
-        self.ax.text(0.7, 0.7, 'Universe Type: %s\nDark Energy Type: %s\nDark Matter Type: %s\nPrimordial Universe: %s\nGravity Type: %s' %('Flat', 'Constant', 'Cold', 'Natural', 'Einstein')
-                     , color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        sim_details_text = 'Universe Type: %s\nDark Energy Type: %s\nDark Matter Type: %s\nPrimordial Universe: %s\nGravity Type: %s' %('Flat', 'Constant', 'Cold', 'Natural', 'Einstein')
+        
+        self.ax.text(0.7, 0.7, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         #self.canvas.mpl_connect('button_press_event', self.onClick)
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
