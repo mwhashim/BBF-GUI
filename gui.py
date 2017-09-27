@@ -635,8 +635,12 @@ class Application(Frame):
 
     def save_movie(self):
         self.SaveDirectory()
-        writer = animation.writers['ffmpeg'](fps=15, extra_args="-i ChillingMusic.wav")
+        writer = animation.writers['ffmpeg'](fps=15)
         self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_movie.mp4", writer=writer, dpi=dpi)
+        video_file = self.savedir + "/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_movie.mp4"
+        audio_file = "ChillingMusic.wav"
+        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -vcodec copy -acodec copy ' + video_file
+        subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
     
     def send_movie(self):
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
