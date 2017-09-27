@@ -663,7 +663,7 @@ class Application(Frame):
         def animate(filename):
             image = np.load(filename); indx = filenames.index(filename)#; image=ndimage.gaussian_filter(image, sigma= sigmaval, truncate=truncateval, mode='wrap')
             im.set_data(image + 1)#; im.set_clim(image.min()+1.,image.max()+1.)
-            self.time.set_text('LookBack Time: %s Gyr' %round(lktime[indx], 4))
+            self.time.set_text('%s %s' %(round(lktime[indx], 4), text_dict['t49']))
             return im
 
         dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
