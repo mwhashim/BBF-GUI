@@ -567,6 +567,7 @@ class Application(Frame):
         alpha1, alpha2 = buildlens(filelens)
         self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.maplensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
     
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
@@ -580,6 +581,7 @@ class Application(Frame):
         alpha1, alpha2 = buildlens(filelens)
         self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.halolensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
 
 
     def showlensMap(self):
@@ -588,6 +590,7 @@ class Application(Frame):
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; self.Lens_map = fits.getdata(filename, ext=0)
         LenImg = self.ax.imshow(self.Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.Lens_map)
     
     def showlenscluster(self):
         self.ax.clear(); self.ax.axis('off')
@@ -595,6 +598,7 @@ class Application(Frame):
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; self.Halo_map = fits.getdata(filename, ext=0)
         HaloImg = self.ax.imshow(self.Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", self.Halo_map)
     
     def run_reset(self):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
@@ -642,12 +646,7 @@ class Application(Frame):
         audio_file = "ChillingMusic.wav"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
-    
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.Lens_map)
-        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", self.Halo_map)
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
-        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
-    
+        
     def send_movie(self):
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
 
