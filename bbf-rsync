@@ -1,0 +1,22 @@
+#!/bin/bash
+echo 'usage: ./bbf-rsync [DIR of Local BBF]'
+
+Omega_M=(0.1 0.25 0.5 0.75 1.0)
+Omega_DE=(0.0 0.25 0.5 0.75 1.0)
+fNL=(1000 -1000)
+
+DIR=$1; BBFdir=/home/PERSONALE/shared/BBF/DATA/BBF/
+
+#------------------------
+for Omega_m in ${Omega_M[*]}; do
+for Omega_L in ${Omega_DE[*]}; do
+for fnL in ${fNL[*]}; do
+
+model_ID=LocalPNG_${fnL}-${Omega_m}-${Omega_L}
+modeldir=${BBFdir}/BBF_${model_ID}
+
+mkdir ${DIR}/BBF_${model_ID} && rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}/BBF_${model_ID}
+
+done
+done
+done

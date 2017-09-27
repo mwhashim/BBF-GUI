@@ -652,6 +652,7 @@ class Application(Frame):
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
     
     def send_movie(self):
+        files = (movie, maplens_photo, halolens_photo)
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
 
     def Main_destory(self):
