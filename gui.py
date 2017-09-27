@@ -565,9 +565,9 @@ class Application(Frame):
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
         alpha1, alpha2 = buildlens(filelens)
-        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(lensedimage)
+        self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.maplensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-
+    
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
         fileimage = CWD + "/tmp/" + self.img_filename + "_Photo.jpg"
@@ -578,22 +578,22 @@ class Application(Frame):
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
         alpha1, alpha2 = buildlens(filelens)
-        lensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(lensedimage)
+        self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.halolensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
 
 
     def showlensMap(self):
         self.ax.clear(); self.ax.axis('off')
         Simu_Dir = self.model_select()+"/Lens-Maps/"
-        filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; Lens_map = fits.getdata(filename, ext=0)
-        LenImg = self.ax.imshow(Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; self.Lens_map = fits.getdata(filename, ext=0)
+        LenImg = self.ax.imshow(self.Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
     
     def showlenscluster(self):
         self.ax.clear(); self.ax.axis('off')
         Simu_Dir = self.model_select()+"/Lens-Maps/"
-        filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; Halo_map = fits.getdata(filename, ext=0)
-        HaloImg = self.ax.imshow(Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; self.Halo_map = fits.getdata(filename, ext=0)
+        HaloImg = self.ax.imshow(self.Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
     
     def run_reset(self):
@@ -642,6 +642,11 @@ class Application(Frame):
         audio_file = "ChillingMusic.wav"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
+    
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.self.Lens_map)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", self.Halo_map)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
     
     def send_movie(self):
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
@@ -740,6 +745,7 @@ class Application(Frame):
         self.img_filename = self.Name_Var.get(); self.img_filename = ''.join(e for e in self.img_filename if e.isalnum())
         
         self.img.save(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
+        
         #----: CAM stop
         if self._job is not None:
             self.after_cancel(self._job)
