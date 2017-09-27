@@ -557,7 +557,7 @@ class Application(Frame):
 
     def MapLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.img_filename + "_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'
@@ -570,7 +570,7 @@ class Application(Frame):
 
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.img_filename + "_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'
@@ -636,10 +636,11 @@ class Application(Frame):
     def save_movie(self):
         self.SaveDirectory()
         writer = animation.writers['ffmpeg'](fps=15)
-        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "_movie.mp4", writer=writer, dpi=dpi) #(" + self.Email_Var.get() + ")
-        video_file = self.savedir + "/" + self.Name_Var.get().split()[-1] + "_movie.mp4" #(" + self.Email_Var.get() + ")
+        self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi)
+        video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
+        muxvideo_file = self.savedir + "/" + self.img_filename + "mux_movie.mp4"
         audio_file = "ChillingMusic.wav"
-        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -vcodec copy -acodec copy ' + video_file
+        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
     
     def send_movie(self):
@@ -672,7 +673,7 @@ class Application(Frame):
         self.time = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
-        arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg")
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
         imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(40., -60.), xycoords='data', boxcoords="offset points", pad=0.1)
@@ -736,7 +737,9 @@ class Application(Frame):
             os.mkdir(CWD + "/tmp/")
 
         self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
-        self.img.save(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg")
+        self.img_filename = self.Name_Var.get(); self.img_filename = ''.join(e for e in self.img_filename if e.isalnum())
+        
+        self.img.save(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
         #----: CAM stop
         if self._job is not None:
             self.after_cancel(self._job)
