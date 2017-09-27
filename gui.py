@@ -257,7 +257,7 @@ class Application(Frame):
         menu1.add_command(label=text_dict['t5'], command=self.run_reset)
         menu1.add_command(label=text_dict['t6'], command=self.save_movie)
         menu1.add_command(label=text_dict['t7'], command=self.send_movie)
-        menu1.add_command(label=text_dict['t8'], command=self.goback)
+        #menu1.add_command(label=text_dict['t8'], command=self.goback)
         menu1.add_separator()
         menu1.add_command(label=text_dict['t9'], command=root.quit)
         
@@ -526,17 +526,17 @@ class Application(Frame):
         for y in range(5):
             Grid.rowconfigure(self.Lensing_group, y, weight=2)
 
-        self.Sow_Lensing_Map = Button(self.Lensing_group, text=text_dict['t37'], command = self.showlensMap)
-        self.Sow_Lensing_Map.grid(row=0, column=0, sticky= W)
+        self.Sow_Lensing_Map = Button(self.Lensing_group, text=text_dict['t37'], command = self.showlensMap, width = 15)
+        self.Sow_Lensing_Map.grid(row=0, column=0, columnspan = 2, sticky= W)
             
-        self.Sow_Lensing_User = Button(self.Lensing_group, text=text_dict['t38'], command = self.MapLensedImage)
-        self.Sow_Lensing_User.grid(row=0, column=1, sticky= W)
+        self.Sow_Lensing_User = Button(self.Lensing_group, text=text_dict['t38'], command = self.MapLensedImage, width = 15)
+        self.Sow_Lensing_User.grid(row=0, column=2, columnspan = 2, sticky= W)
 
-        self.Halo_Lensing_Map = Button(self.Lensing_group, text=text_dict['t39'], command = self.showlenscluster)
-        self.Halo_Lensing_Map.grid(row=1, column=0, sticky= W)
+        self.Halo_Lensing_Map = Button(self.Lensing_group, text=text_dict['t39'], command = self.showlenscluster, width = 15)
+        self.Halo_Lensing_Map.grid(row=1, column=0, columnspan = 2, sticky= W)
         
-        self.Halo_Lensing_User = Button(self.Lensing_group, text=text_dict['t40'], command = self.HaloLensedImage)
-        self.Halo_Lensing_User.grid(row=1, column=1, sticky= W)
+        self.Halo_Lensing_User = Button(self.Lensing_group, text=text_dict['t40'], command = self.HaloLensedImage, width = 15)
+        self.Halo_Lensing_User.grid(row=1, column=2, columnspan = 2, sticky= W)
         
         Label(self.Lensing_group, text=text_dict['t41'], justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
             
@@ -544,22 +544,20 @@ class Application(Frame):
         #self.ComvDist_Var.trace("w", self.callback_NBodyTrace)
         self.ComvDist=Scale(self.Lensing_group, from_=0.0, to=100.0, resolution=10.0, orient=HORIZONTAL, width=15, length=300, variable = self.ComvDist_Var, digits=2)
         self.ComvDist.grid(row=3, column=0, sticky= W+E+N+S, pady = 5, columnspan = 4)
-    
-    
-#        self.Name_Var = StringVar()
-#        self.User_Name = Entry(self.Name_Dict_group, textvariable=self.Name_Var)
-#        self.User_Name.grid(row=0, column=1, sticky= W+E+N+S,  columnspan = 6)
-#            
-        #self.name_Var.set(None)
 
 
-#
-#        self.Run_Dict = {'Lambda_': 'Constant', 'Quint_': 'Quintessence', 'Phantom_': 'Phantom',
-#                        'LocalPNG_1000-': ''}
+        self.Logo_group = LabelFrame(self.Control_Frame)
+        self.Logo_group.grid(row = 3, column = 0, columnspan = 4, sticky = W+E+N+S)
+
+        logoimg = ImageTk.PhotoImage(file="SIMCODE.png")
+        LogoButton = Button(self.Logo_group, command = self.goback)
+        LogoButton.config(image=logoimg)
+        LogoButton.image = logoimg
+        LogoButton.pack(fill=BOTH, expand=1)
 
     def MapLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'
@@ -572,7 +570,7 @@ class Application(Frame):
 
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'
@@ -637,11 +635,11 @@ class Application(Frame):
 
     def save_movie(self):
         self.SaveDirectory()
-        writer = animation.writers['ffmpeg'](fps=15)
-        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "'s_movie.mp4", writer=writer, dpi=dpi)
+        writer = animation.writers['ffmpeg'](fps=15, extra_args="-i ChillingMusic.wav")
+        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_movie.mp4", writer=writer, dpi=dpi)
     
     def send_movie(self):
-        emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "'s_movie.mp4")
+        emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -666,15 +664,21 @@ class Application(Frame):
         dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
         im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
-        self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize=10, color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
-        self.time = self.ax.text(0.15, 0.1 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
+        self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        self.time = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
-        arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
-        imagebox = OffsetImage(arr_hand, zoom=.05); xy = [0.30, 0.45] # coordinates to position this image
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg")
+        imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(40., -60.), xycoords='data', boxcoords="offset points", pad=0.1)
         self.ax.add_artist(ab)
+        
+        
+        arr_hand1 = mpimg.imread("SIMCODE.png")
+        imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0] # coordinates to position this image
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1)
+        self.ax.add_artist(ab1)
 
         #iMpc = lambda x: x*1024/125  #x in Mpc, return in Pixel *3.085e19
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
@@ -728,7 +732,7 @@ class Application(Frame):
             os.mkdir(CWD + "/tmp/")
 
         self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
-        self.img.save(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "'s_Photo.jpg")
+        self.img.save(CWD + "/tmp/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_Photo.jpg")
         #----: CAM stop
         if self._job is not None:
             self.after_cancel(self._job)
