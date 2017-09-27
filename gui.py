@@ -636,8 +636,8 @@ class Application(Frame):
     def save_movie(self):
         self.SaveDirectory()
         writer = animation.writers['ffmpeg'](fps=15)
-        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_movie.mp4", writer=writer, dpi=dpi)
-        video_file = self.savedir + "/" + self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get() + ")_movie.mp4"
+        self.ani.save(self.savedir + "/" + self.Name_Var.get().split()[-1] + "_movie.mp4", writer=writer, dpi=dpi) #(" + self.Email_Var.get() + ")
+        video_file = self.savedir + "/" + self.Name_Var.get().split()[-1] + "_movie.mp4" #(" + self.Email_Var.get() + ")
         audio_file = "ChillingMusic.wav"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -vcodec copy -acodec copy ' + video_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
