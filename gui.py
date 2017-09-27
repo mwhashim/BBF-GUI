@@ -268,6 +268,7 @@ class Application(Frame):
         menu3 = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label=text_dict['t12'], menu=menu3)
         menu3.add_command(label=text_dict['t13'], command=self.myDialog)
+        menu3.add_command(label=text_dict['t131'], command=self.SaveDirectory)
         
         self.master.config(menu=self.menubar)
 
@@ -590,7 +591,7 @@ class Application(Frame):
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; self.Lens_map = fits.getdata(filename, ext=0)
         LenImg = self.ax.imshow(self.Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.Lens_map)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", log(self.Lens_map + 1), cmap=matplotlib.cm.magma)
     
     def showlenscluster(self):
         self.ax.clear(); self.ax.axis('off')
@@ -598,7 +599,7 @@ class Application(Frame):
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; self.Halo_map = fits.getdata(filename, ext=0)
         HaloImg = self.ax.imshow(self.Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", self.Halo_map)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", log(self.Halo_map + 1), cmap=matplotlib.cm.magma)
     
     def run_reset(self):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
@@ -638,7 +639,6 @@ class Application(Frame):
         return model
 
     def save_movie(self):
-        self.SaveDirectory()
         writer = animation.writers['ffmpeg'](fps=15)
         self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi)
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
@@ -646,7 +646,7 @@ class Application(Frame):
         audio_file = "ChillingMusic.wav"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
-        
+    
     def send_movie(self):
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, self.Name_Var.get().split()[-1] + "(" + self.Email_Var.get()  + ")_movie.mp4")
 
