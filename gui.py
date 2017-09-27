@@ -643,7 +643,7 @@ class Application(Frame):
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
     
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.self.Lens_map)
+        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", self.Lens_map)
         imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", self.Halo_map)
         imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
         imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
