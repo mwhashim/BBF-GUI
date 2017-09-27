@@ -117,33 +117,35 @@ def buildlens(filelens):
     return image_data1, image_data2
 
 
-def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac):
-#    
-#    for ll in range(0,len(zz)):\n",
-#        zs=zz[ll]\n",
-#        dl = np.array(cosmo.angular_diameter_distance(zl)*cosmo.H(0.)/100.)
-#        ds = np.array(cosmo.angular_diameter_distance(zs)*cosmo.H(0.)/100.)
-#        dls = (np.array(cosmo.angular_diameter_distance(zs)*cosmo.H(0.)/100.)*(1+zs) - np.array(cosmo.angular_diameter_distance(zl)*cosmo.H(0.)/100.)*(1+zl))/(1+zs)
-    ds = 1156.34008206061
-    dl = 564.558513269509
-    dls = 803.491011267171 + scalefac
+def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac, cosmo, LensType):
     
-    f = ds/dl/dls/xsize*2.5e8
-    
+    if LensType == "LSS":
+        ds = cosmo.angular_diameter_distance(1.0).value*cosmo.H(0.).value/100.; dl = 1.; dls = 1.
+        f = ds/dl/dls/xsize*1e2 * scalefac
+    elif LensType == "HALO":
+        ds = cosmo.angular_diameter_distance(1.0).value*cosmo.H(0.).value/100.
+        dl = cosmo.angular_diameter_distance(0.5).value*cosmo.H(0.).value/100.
+        dls = (2. * ds  - dl * 1.5)/2.
+        f = ds/dl/dls/xsize*1e6 * scalefac
+
     lensed_data = copy(image_arr)
     #print xsize, ysize
     for i in range(0,xsize):
         for j in range(0,ysize):
             ii = i - image_data2[i][j]*f + 0.5
             if int(ii) >= xsize:
-                ii = int(ii - xsize)
+                aa = int(ii/xsize)
+                ii = int(ii - xsize * aa)
             if int(ii) < -0.5:
-                ii = int(ii + xsize)
+                naa = -int(ii/xsize)
+                ii = int(ii + xsize * naa)
             jj = j - image_data1[i][j]*f + 0.5
             if int(jj) >= ysize:
-                jj = int(jj - ysize)
+                bb = int(jj/ysize)
+                jj = int(jj - ysize * bb)
             if int(jj) < -0.5:
-                jj = int(jj + ysize)
+                nbb = -int(jj/ysize)
+                jj = int(jj + ysize * nbb)
             lensed_data[i][j] = image_arr[int(ii),int(jj)]
 
     return lensed_data
@@ -204,7 +206,7 @@ class Application(Frame):
         self.Frame_0 = Frame(frame, bg="white smoke")
         self.Frame_0.grid(row = 0, column = 0, rowspan = 7, columnspan = 6, sticky = W+E+N+S)
         
-        self.original = Image.open("BBF-Logo.gif"); self.Background_photo = ImageTk.PhotoImage(self.original)
+        self.original = Image.open("BBF_frontpage.png"); self.Background_photo = ImageTk.PhotoImage(self.original)
         self.Welcome_Frame = Canvas(self.Frame_0) #, image = Background_photo
         self.Welcome_Frame.create_image(0, 0, image=self.Background_photo, anchor=NW, tags="IMG")
         self.Welcome_Frame.pack(side=TOP, fill=BOTH, expand=1)
@@ -566,7 +568,8 @@ class Application(Frame):
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
         alpha1, alpha2 = buildlens(filelens)
-        self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.maplensedimage)
+        cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
+        self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "LSS"); self.ax.imshow(self.maplensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
     
@@ -580,7 +583,8 @@ class Application(Frame):
         image, xsize, ysize = readimage(fileimage); image_arr = np.array(image)
         
         alpha1, alpha2 = buildlens(filelens)
-        self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get()); self.ax.imshow(self.halolensedimage)
+        cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
+        self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "HALO"); self.ax.imshow(self.halolensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
 
@@ -658,7 +662,6 @@ class Application(Frame):
 
     def start(self):
         self.progress_var.set(0); self.frames = 0; self.maxframes = 0
-        
         
         Simu_Dir = self.model_select()+"/Dens-Maps/"
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
