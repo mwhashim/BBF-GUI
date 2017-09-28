@@ -47,5 +47,9 @@ text_dict = { 't1': 'Big Bang Factory',
               't46': 'Email',
               't47': 'Password',
               't48': 'Submit',
-              't49': 'Billion Years Ago'
+              't49': 'Billion Years Ago',
+              't50': 'Flat',
+              't51': 'Closed',
+              't52': 'Open',
+              't53': 'Space Curvature'
               }

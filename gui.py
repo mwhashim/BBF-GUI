@@ -24,7 +24,7 @@ from collections import *
 
 #----------------------------------
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('TkAgg')#; matplotlib.rcParams["figure.facecolor"]
 
 #from six.moves import tkinter_filedialog as FileDialog
 
@@ -212,8 +212,9 @@ class Application(Frame):
         self.Welcome_Frame.pack(side=TOP, fill=BOTH, expand=1)
         self.Frame_0.bind("<Configure>", self.resize)
         
-        Welcome_buttom = Button(self.Frame_0, text=text_dict['t3'], command=self.Sim_Create)
-        Welcome_buttom.pack()
+        ttk.Style().configure('blue/white.TLabel', foreground='blue', background='white', font=('Helvetica', 24))
+        Welcome_buttom = ttk.Button(self.Frame_0, text=text_dict['t3'], style='blue/white.TLabel', command=self.Sim_Create) #, font="helvetica 24 bold"
+        Welcome_buttom.place(relx=.5, rely=.5, anchor="center")
         
         #---------------------------------------
     def Sim_Create(self):
@@ -288,7 +289,7 @@ class Application(Frame):
         self.run.pack(side="left")
 
     def PlotPan(self, frame):
-        fig = plt.Figure()
+        fig = plt.Figure(facecolor='0.7')
         ax = fig.add_subplot(111); ax.axis('off'); ax.get_xaxis().set_visible(False); ax.get_yaxis().set_visible(False)
         fig.set_tight_layout(True) # fig.tight_layout()
         
@@ -529,16 +530,16 @@ class Application(Frame):
         for y in range(5):
             Grid.rowconfigure(self.Lensing_group, y, weight=2)
 
-        self.Sow_Lensing_Map = Button(self.Lensing_group, text=text_dict['t37'], command = self.showlensMap, width = 15)
+        self.Sow_Lensing_Map = Button(self.Lensing_group, text=text_dict['t37'], command = self.showlensMap, width = 20)
         self.Sow_Lensing_Map.grid(row=0, column=0, columnspan = 2, sticky= W)
             
-        self.Sow_Lensing_User = Button(self.Lensing_group, text=text_dict['t38'], command = self.MapLensedImage, width = 15)
+        self.Sow_Lensing_User = Button(self.Lensing_group, text=text_dict['t38'], command = self.MapLensedImage, width = 20)
         self.Sow_Lensing_User.grid(row=0, column=2, columnspan = 2, sticky= W)
 
-        self.Halo_Lensing_Map = Button(self.Lensing_group, text=text_dict['t39'], command = self.showlenscluster, width = 15)
+        self.Halo_Lensing_Map = Button(self.Lensing_group, text=text_dict['t39'], command = self.showlenscluster, width = 20)
         self.Halo_Lensing_Map.grid(row=1, column=0, columnspan = 2, sticky= W)
         
-        self.Halo_Lensing_User = Button(self.Lensing_group, text=text_dict['t40'], command = self.HaloLensedImage, width = 15)
+        self.Halo_Lensing_User = Button(self.Lensing_group, text=text_dict['t40'], command = self.HaloLensedImage, width = 20)
         self.Halo_Lensing_User.grid(row=1, column=2, columnspan = 2, sticky= W)
         
         Label(self.Lensing_group, text=text_dict['t41'], justify=LEFT, anchor=W).grid(row=2, column=0, sticky= W+E+N+S, pady = 5)
@@ -618,23 +619,35 @@ class Application(Frame):
         if self.Lambda_Var.get() != 'Lambda_':
             run_type = self.Lambda_Var.get()
             if run_type == "Quint_":
-                self.wx = -0.9
+                self.wx = -0.9; self.DE_type = text_dict['t22']
             else:
-                self.wx = -1.1
-
+                self.wx = -1.1; self.DE_type = text_dict['t23']
         elif self.CDM_Var.get()  != 'Lambda_':
-            run_type = self.CDM_Var.get(); self.wx = -1.0
+            run_type = self.CDM_Var.get(); self.wx = -1.0; self.DM_type = text_dict['t26']
         elif self.IniM_Var.get() != 'Lambda_':
             run_type = self.IniM_Var.get(); self.wx = -1.0
+            if run_type == "LocalPNG_1000-":
+                self.EU_Type = 'Positive'
+            else:
+                self.EU_Type = 'Negative'
         elif self.MG_Var.get() != 'Lambda_':
-            run_type = self.MG_Var.get(); self.wx = -1.0
+            run_type = self.MG_Var.get(); self.wx = -1.0; self.MG_Type = text_dict['t33']
         else:
-            run_type = 'Lambda_'; self.wx = -1.0
+            run_type = 'Lambda_'; self.wx = -1.0; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
 
         if self.Omega_m_Var.get() == 0.0:
             Omega_m = 0.1; Omega_m = str(Omega_m)
         else:
             Omega_m = str(self.Omega_m_Var.get())
+
+        Omega_k = 1. - (self.Omega_m_Var.get() + self.Omega_l_Var.get())
+
+        if Omega_k == 0:
+            self.SC_Type = text_dict['t50']
+        elif Omega_k > 0:
+            self.SC_Type = text_dict['t51']
+        else:
+            self.SC_Type = text_dict['t52']
 
         model  = "BBF_" + run_type + Omega_m + "-" + str(self.Omega_l_Var.get())
         self.model_name = run_type + Omega_m + "-" + str(self.Omega_l_Var.get())
@@ -697,11 +710,13 @@ class Application(Frame):
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax.add_artist(ob)
         
-        sim_details_text = 'Universe Type: %s\nDark Energy Type: %s\nDark Matter Type: %s\nPrimordial Universe: %s\nGravity Type: %s' %('Flat', 'Constant', 'Cold', 'Natural', 'Einstein')
         
-        self.ax.text(0.7, 0.7, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
-        #self.canvas.mpl_connect('button_press_event', self.onClick)
+        
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        print sim_details_text
+        self.ax.text(0.72, 0.7, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
 
@@ -819,6 +834,7 @@ class Application(Frame):
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
-    root = Tk()
+    root = Tk()#; root.attributes("-fullscreen", True)
+    #root.bind("<Escape>", root.attributes("-fullscreen", False) )
     app = Application(master=root)
     app.mainloop()
