@@ -629,7 +629,7 @@ class Application(Frame):
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
         self.muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
         audio_file = "ChillingMusic.wav"
-        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
+        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + self.muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
     
     def send_movie(self):
@@ -668,7 +668,7 @@ class Application(Frame):
         sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
         
         print sim_details_text
-        self.textext = self.ax.text(0.5, 0.88, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        self.textext = self.ax.text(0.18, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         self.toggle_images()
