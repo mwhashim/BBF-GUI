@@ -667,8 +667,10 @@ class Application(Frame):
         self.textext = self.ax.text(0.5, 0.88, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        self.toggle_images(); self.ax.clear(); self.ax.axis('off')
-        #self.textannotate.remove(); self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
+        self.toggle_images()
+        self.textannotate.remove(); self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
+        self.ax.clear(); self.ax.axis('off')
+    
     
     def toggle_images(self):
         b1 = self.im0.get_visible(); b2 = self.im1.get_visible()
