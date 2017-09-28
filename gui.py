@@ -374,20 +374,22 @@ class Application(Frame):
 
         self.Omega_l_Var= DoubleVar()
         #self.Omega_l_Var.trace("w", self.callback_NBodyTrace)
-        self.Omega_l=Scale(self.Cosmo_Parms_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=400, variable = self.Omega_l_Var, digits=3)
-        #Entry(self.Cosmo_Parms_group, textvariable=self.Omega_l_Var, width=10)
-        self.Omega_l.grid(row=0, column=1, sticky= W+E+N+S, pady = 5, columnspan = 3)
-
-
+        self.Omega_l=Scale(self.Cosmo_Parms_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=300, variable = self.Omega_l_Var, digits=3, showvalue=0)
+        self.Omega_l.grid(row=0, column=1, sticky= W+E+N+S, pady = 5, columnspan = 2)
+        Label(self.Cosmo_Parms_group, textvariable=self.Omega_l_Var).grid(row=0, column=4, sticky= W+E+N+S, pady = 5)
+        
         Omega_m_label = Label(self.Cosmo_Parms_group, text="Omega_m", image = Omega_m_photo)
         Omega_m_label.photo = Omega_m_photo
         Omega_m_label.grid(row=1, column=0, sticky= W+E+N+S, pady = 5)
 
         self.Omega_m_Var= DoubleVar()
-        #self.Omega_m_Var.trace("w", self.callback_NBodyTrace)
-        self.Omega_m= Scale(self.Cosmo_Parms_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=400,variable = self.Omega_m_Var, digits=3)
-        #Entry(self.Cosmo_Parms_group, textvariable=self.Omega_m_Var, width=10)
-        self.Omega_m.grid(row=1, column=1, sticky= W+E+N+S, pady = 5, columnspan = 3)
+        self.Omega_m_Var.trace("w", self.callback_OmegamTrace)
+        self.Omega_m= Scale(self.Cosmo_Parms_group, from_=0.0, to=1.0, resolution=0.25, orient=HORIZONTAL, width=15, length=300, variable = self.Omega_m_Var, digits=3, showvalue=0)
+        self.Omega_m.grid(row=1, column=1, sticky= W+E+N+S, pady = 5, columnspan = 2)
+
+        self.nOmega_m_Var = StringVar()
+        Label(self.Cosmo_Parms_group, textvariable=self.nOmega_m_Var).grid(row=1, column=4, sticky= W+E+N+S, pady = 5)
+        self.nOmega_m_Var.set('0.1')
 
 
         self.DarkEnergy_group = LabelFrame(self.NewRun_page, text = text_dict['t20'])
@@ -854,6 +856,13 @@ class Application(Frame):
         
         submit = Button(Entry_dialog, text =text_dict['t48'], command = getDate)
         submit.grid(row=3, column=0,columnspan=2, sticky= W+E+N+S)
+
+
+    def callback_OmegamTrace(self, *args):
+        if self.Omega_m_Var.get() == 0.0:
+            self.nOmega_m_Var.set('0.1')
+        else:
+            self.nOmega_m_Var.set(str(self.Omega_m_Var.get()))
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
