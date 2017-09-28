@@ -540,7 +540,7 @@ class Application(Frame):
         self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "LSS"); self.ax.imshow(self.maplensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
-        self.LensedMap_Photo = self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg"
+        self.LensedMap_Photo = self.img_filename + "_LensedMap_Photo.jpg"
     
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
@@ -556,7 +556,7 @@ class Application(Frame):
         self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "HALO"); self.ax.imshow(self.halolensedimage)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
-        self.LensedHalo_Photo = self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg"
+        self.LensedHalo_Photo = self.img_filename + "_LensedHalo_Photo.jpg"
 
 
     def showlensMap(self):
@@ -566,7 +566,7 @@ class Application(Frame):
         LenImg = self.ax.imshow(self.Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", log(self.Lens_map + 1), cmap=matplotlib.cm.magma)
-        self.LensedMap = self.savedir + "/" + self.img_filename + "_LensedMap.jpg"
+        self.LensedMap = self.img_filename + "_LensedMap.jpg"
     
     def showlenscluster(self):
         self.ax.clear(); self.ax.axis('off')
@@ -575,7 +575,7 @@ class Application(Frame):
         HaloImg = self.ax.imshow(self.Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", log(self.Halo_map + 1), cmap=matplotlib.cm.magma)
-        self.LensedHalo = self.savedir + "/" + self.img_filename + "_LensedHalo.jpg"
+        self.LensedHalo = self.img_filename + "_LensedHalo.jpg"
     
     def run_reset(self):
         self.progress_var.set(0); self.ax.clear(); self.ax.axis('off'); self.canvas.show()
@@ -627,13 +627,14 @@ class Application(Frame):
         writer = animation.writers['ffmpeg'](fps=15)
         self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi)
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
-        self.muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
+        muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
         audio_file = "ChillingMusic.wav"
-        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + self.muxvideo_file
+        cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
+        self.muxvideo = self.img_filename + "_mux_movie.mp4"
     
     def send_movie(self):
-        files = (self.muxvideo_file, self.LensedMap, self.LensedMap_Photo, self.LensedHalo, self.LensedHalo_Photo)
+        files = (self.muxvideo, self.LensedMap, self.LensedMap_Photo, self.LensedHalo, self.LensedHalo_Photo)
         emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, files)
 
     def Main_destory(self):
@@ -722,7 +723,7 @@ class Application(Frame):
         
         sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
         print sim_details_text
-        self.ax.text(0.5, 0.88, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        self.ax.text(0.18, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
