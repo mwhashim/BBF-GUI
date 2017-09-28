@@ -33,6 +33,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from pylab import *
 from itertools import cycle
+from itertools import product
 import pandas as pd
 
 import subprocess, shlex
@@ -94,6 +95,24 @@ def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac, cosmo, Lens
         f = ds/dl/dls/xsize*1e6 * scalefac
 
     lensed_data = copy(image_arr)
+    # Matteo Loop version
+    IJ = [tuple(x) for x in product(arange(xsize), arange(ysize))]
+
+    IJ_new = array(IJ) - f * array([ [ image_data2[ij], image_data1[ij] ] for ij in IJ ])
+
+    IJ_new += 0.5
+
+    IJ_new[:,0] = IJ_new[:,0] % xsize
+    IJ_new[:,1] = IJ_new[:,1] % ysize
+
+    IJ_new = IJ_new.astype(int)
+    IJ_new = [ tuple(ij_new) for ij_new in IJ_new ]
+
+    for (ij,ij_new) in zip(IJ,IJ_new):
+        lensed_data[ij] = image_arr[ij_new]
+
+    # Carlo Loop version
+    '''
     for i in range(0,xsize):
         for j in range(0,ysize):
             ii = i - image_data2[i][j]*f + 0.5
@@ -111,7 +130,7 @@ def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac, cosmo, Lens
                 nbb = -int(jj/ysize)
                 jj = int(jj + ysize * nbb)
             lensed_data[i][j] = image_arr[int(ii),int(jj)]
-
+    '''
     return lensed_data
 
 def center(toplevel):
