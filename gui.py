@@ -673,7 +673,7 @@ class Application(Frame):
         self.im1 = self.ax.imshow(dens_map1 + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
         self.im1.set_visible(False)
 
-        self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        #self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.timetime = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[-1], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
         
         arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg"); imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45]
@@ -687,14 +687,14 @@ class Application(Frame):
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax.add_artist(ob)
         
-        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
         
         print sim_details_text
         self.textext = self.ax.text(0.18, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
         self.toggle_images()
-        self.textannotate.remove(); self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
+        self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
         self.ax.clear(); self.ax.axis('off')
     
     
@@ -719,7 +719,7 @@ class Application(Frame):
         dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
         im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
-        self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        #self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.time = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
@@ -739,10 +739,7 @@ class Application(Frame):
         ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
         self.ax.add_artist(ob)
         
-        
-        
-        
-        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
         print sim_details_text
         self.ax.text(0.18, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
