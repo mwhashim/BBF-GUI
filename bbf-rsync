@@ -1,23 +1,50 @@
 #!/bin/bash
 echo 'usage: ./bbf-rsync [DIR of Local BBF]'
 
-Omega_M=(0.25)  #(0.1 0.25 0.5 0.75 1.0)
-Omega_DE=(0.75) #(0.0 0.25 0.5 0.75 1.0)
+Omega_M=(0.1 0.25 0.5 0.75 1.0)
+Omega_DE=(0.0 0.25 0.5 0.75 1.0)
+
+DE_type=(Lambda Quint Phantom)
 fNL=(1000 -1000)
+m_WDM=0.5
 
 DIR=$1; BBFdir=/home/PERSONALE/shared/BBF/DATA/BBF/
 
-#------------------------
+#---: Dark Energy suite
 for Omega_m in ${Omega_M[*]}; do
 for Omega_L in ${Omega_DE[*]}; do
-#for fnL in ${fNL[*]}; do
+for type in ${DE_type[*]}; do
 
-#model_ID=LocalPNG_${fnL}-${Omega_m}-${Omega_L}
-model_ID=wDM_0.5-${Omega_m}-${Omega_L}
+model_ID=${type}_${Omega_m}-${Omega_L}
 modeldir=${BBFdir}/BBF_${model_ID}
 
-rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR} #/BBF_${model_ID}
-# mkdir ${DIR}/BBF_${model_ID} && 
+rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
 done
 done
-#done
+done
+
+#---: Dark Matter suite
+for Omega_m in ${Omega_M[*]}; do
+for Omega_L in ${Omega_DE[*]}; do
+
+model_ID=wDM_${m_WDM}-${Omega_m}-${Omega_L}
+modeldir=${BBFdir}/BBF_${model_ID}
+
+rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
+done
+done
+
+#---: PNG suite
+for Omega_m in ${Omega_M[*]}; do
+for Omega_L in ${Omega_DE[*]}; do
+for fnL in ${fNL[*]}; do
+
+model_ID=LocalPNG_${fnL}-${Omega_m}-${Omega_L}
+modeldir=${BBFdir}/BBF_${model_ID}
+
+rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
+done
+done
+done
+
+
