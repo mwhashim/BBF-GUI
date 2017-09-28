@@ -3,6 +3,8 @@ import mimetypes
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.MIMEText import MIMEText
+from email.MIMEImage import MIMEImage
+from email.MIMEAudio import MIMEAudio
 from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 
