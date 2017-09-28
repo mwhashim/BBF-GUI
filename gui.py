@@ -255,7 +255,7 @@ class Application(Frame):
     def PlotPan(self, frame):
         fig = plt.Figure(facecolor='0.7')
         ax = fig.add_subplot(111); ax.axis('off'); ax.get_xaxis().set_visible(False); ax.get_yaxis().set_visible(False)
-        fig.set_tight_layout(True) # fig.tight_layout()
+        fig.tight_layout()#fig.set_tight_layout(True) 
         
         canvas = FigureCanvasTkAgg(fig, master = frame)
         #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
