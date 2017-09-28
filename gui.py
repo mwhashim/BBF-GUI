@@ -619,19 +619,19 @@ class Application(Frame):
         if self.Lambda_Var.get() != 'Lambda_':
             run_type = self.Lambda_Var.get()
             if run_type == "Quint_":
-                self.wx = -0.9; self.DE_type = text_dict['t22']
+                self.wx = -0.9; self.DE_type = text_dict['t22']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
             else:
-                self.wx = -1.1; self.DE_type = text_dict['t23']
+                self.wx = -1.1; self.DE_type = text_dict['t23']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
         elif self.CDM_Var.get()  != 'Lambda_':
-            run_type = self.CDM_Var.get(); self.wx = -1.0; self.DM_type = text_dict['t26']
+            run_type = self.CDM_Var.get(); self.wx = -1.0; self.DM_type = text_dict['t26']; self.DE_type = text_dict['t21']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
         elif self.IniM_Var.get() != 'Lambda_':
             run_type = self.IniM_Var.get(); self.wx = -1.0
             if run_type == "LocalPNG_1000-":
-                self.EU_Type = 'Positive'
+                self.EU_Type = 'Positive'; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.MG_Type = text_dict['t32']
             else:
-                self.EU_Type = 'Negative'
+                self.EU_Type = 'Negative'; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.MG_Type = text_dict['t32']
         elif self.MG_Var.get() != 'Lambda_':
-            run_type = self.MG_Var.get(); self.wx = -1.0; self.MG_Type = text_dict['t33']
+            run_type = self.MG_Var.get(); self.wx = -1.0; self.MG_Type = text_dict['t33']; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']
         else:
             run_type = 'Lambda_'; self.wx = -1.0; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
 
@@ -695,9 +695,9 @@ class Application(Frame):
 
 
         arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
-        imagebox = OffsetImage(arr_hand, zoom=.04); xy = [0.30, 0.45] # coordinates to position this image
+        imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45] # coordinates to position this image
 
-        ab = AnnotationBbox(imagebox, xy, xybox=(40., -60.), xycoords='data', boxcoords="offset points", pad=0.1)
+        ab = AnnotationBbox(imagebox, xy, xybox=(50., -70.), xycoords='data', boxcoords="offset points", pad=0.1)
         self.ax.add_artist(ab)
         
         
@@ -715,7 +715,7 @@ class Application(Frame):
         
         sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
         print sim_details_text
-        self.ax.text(0.72, 0.7, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        self.ax.text(0.5, 0.88, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ani = animation.FuncAnimation(self.fig, animate, filenames, repeat=False, interval=25, blit=False)
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
