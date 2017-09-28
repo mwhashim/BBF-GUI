@@ -9,7 +9,6 @@ import logging
 import glob
 from threading import Thread
 import Queue
-#from KThread import *
 
 import time
 
@@ -19,14 +18,9 @@ from scipy import ndimage
 import decimal
 from collections import *
 
-#import paramiko
-#paramiko.util.log_to_file('/tmp/paramiko.log')
-
 #----------------------------------
 import matplotlib
-matplotlib.use('TkAgg')#; matplotlib.rcParams["figure.facecolor"]
-
-#from six.moves import tkinter_filedialog as FileDialog
+matplotlib.use('TkAgg')
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.widgets import Slider, Button, RadioButtons
@@ -41,24 +35,11 @@ from pylab import *
 from itertools import cycle
 import pandas as pd
 
-#from six.moves import tkinter_filedialog as FileDialog
-
-#from scipy.interpolate import interp1d, UnivariateSpline, InterpolatedUnivariateSpline
-
-#import VerticalScrolledFrame as VSF
-#import Tooltip
-#import ViewLog as VL
-
-#import ParamsDict as PrDt
-#import MakefileDict as MkDt
-#import TooltipDict as TtDt
-
 import subprocess, shlex
 
 import ttk
 import tkFileDialog, Tkconstants
-#import tkinter.filedialog, tkinter.messagebox
-#
+
 if sys.version_info[0] < 3:
     from Tkinter import *
     from Tkinter import _setit
@@ -66,19 +47,13 @@ else:
     from tkinter import *
     from tkinter import _setit
 
-
-#from mttkinter import *
-
-
 import cv2
 from PIL import Image, ImageTk
-#from CosmoSuite import *
 
 from astropy.cosmology import wCDM
 from astropy.io import fits
 
 from emailling import *
-
 from textdictENG import text_dict
 
 #----------------------------------
@@ -90,18 +65,8 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-#---- Alignment-----
-# build a rectangle in axes coords
-left, width = .25, .5
-bottom, height = .25, .5
-right = left + width
-top = bottom + height
-
-sigmaval = 1.; truncateval = 3.
-
 #--- CWD -----
-CWD = os.getcwd()#; print CWD
-#CWD = '/Users/mahmoud/Desktop/BBFpipeline_gui' #os.path.dirname(os.path.abspath(__file__))
+CWD = os.getcwd() #os.path.dirname(os.path.abspath(__file__))
 #-----------------------------
 def readimage(fileimage):
     image = Image.open(fileimage)
@@ -129,7 +94,6 @@ def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac, cosmo, Lens
         f = ds/dl/dls/xsize*1e6 * scalefac
 
     lensed_data = copy(image_arr)
-    #print xsize, ysize
     for i in range(0,xsize):
         for j in range(0,ysize):
             ii = i - image_data2[i][j]*f + 0.5
@@ -183,7 +147,7 @@ class Application(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.grid()
-        self.master.title(text_dict['t1'])#("Big Bang Factory")
+        self.master.title(text_dict['t1'])
 
         #---------------------------------------
         for r in range(7):
@@ -207,7 +171,7 @@ class Application(Frame):
         self.Frame_0.grid(row = 0, column = 0, rowspan = 7, columnspan = 6, sticky = W+E+N+S)
         
         self.original = Image.open("BBF_frontpage.png"); self.Background_photo = ImageTk.PhotoImage(self.original)
-        self.Welcome_Frame = Canvas(self.Frame_0) #, image = Background_photo
+        self.Welcome_Frame = Canvas(self.Frame_0)
         self.Welcome_Frame.create_image(0, 0, image=self.Background_photo, anchor=NW, tags="IMG")
         self.Welcome_Frame.pack(side=TOP, fill=BOTH, expand=1)
         self.Frame_0.bind("<Configure>", self.resize)
@@ -514,6 +478,9 @@ class Application(Frame):
         Grid.rowconfigure(self.Simulation_group, 0, weight=0)
         self.Simulation_Run = Button(self.Simulation_group, text = text_dict['t35'], foreground = 'red', command = self.start)
         self.Simulation_Run.grid(column = 0, row = 0, pady = 5, sticky= W+E+N+S)
+        
+        self.Simulation_compare = Button(self.Simulation_group, text = text_dict['t351'], foreground = 'red', command = self.model_compare)
+        self.Simulation_compare.grid(column = 1, row = 0, pady = 5, sticky= W+E+N+S)
 
         self.progress_var = DoubleVar()
         self.progress = ttk.Progressbar(self.Simulation_group, variable=self.progress_var,  orient="horizontal", length=300, mode="determinate")
@@ -611,9 +578,6 @@ class Application(Frame):
         self.Name_Var.set(''); self.Email_Var.set(''); self.Omega_m_Var.set(0.0); self.Omega_l_Var.set(0.0)
         self.Lambda_Var.set('Lambda_'); self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
         shutil.rmtree(CWD + "/tmp/")
-        
-        #if self._job1 is not None: self.after_cancel(self._job1); self._job1 = None
-    
 
     def model_select(self):
         if self.Lambda_Var.get() != 'Lambda_':
@@ -673,7 +637,44 @@ class Application(Frame):
 
     def Main_recreate(self, event):
         self.initialize(); self.Sim_Create()
+    
+    def model_compare(self):
+        Simu_Dir = self.model_select()+"/Dens-Maps/"
+        cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
+        filenames=sorted(glob.glob(self.simdir + "/" + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
+        dens_map = load(filenames[-1]); dens_map1 = load(self.simdir + "/BBF_Lambda_0.25-0.75/Dens-Maps/Lambda_0.25-0.75_snap_299_image.npy")
+        self.im0 = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
+        self.im1 = self.ax.imshow(dens_map1 + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
+        self.im1.set_visible(False)
 
+        self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
+        self.timetime = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[-1], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
+        
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg"); imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45]
+        ab = AnnotationBbox(imagebox, xy, xybox=(50., -70.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab)
+        
+        arr_hand1 = mpimg.imread("SIMCODE.png")
+        imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0] # coordinates to position this image
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1)
+        self.ax.add_artist(ab1)
+        
+        ob = AnchoredHScaleBar(size=0.1, label="10Mpc", loc=4, frameon=False, pad=0.6, sep=2, color="white", linewidth=0.8)
+        self.ax.add_artist(ob)
+        
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        
+        print sim_details_text
+        self.textext = self.ax.text(0.5, 0.88, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        self.toggle_images(); self.ax.clear(); self.ax.axis('off')
+        #self.textannotate.remove(); self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
+    
+    def toggle_images(self):
+        b1 = self.im0.get_visible(); b2 = self.im1.get_visible()
+        self.im0.set_visible(not b1); self.im1.set_visible(not b2)
+        self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
+        
     def start(self):
         self.progress_var.set(0); self.frames = 0; self.maxframes = 0
         
