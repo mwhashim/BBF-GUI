@@ -478,7 +478,7 @@ class Application(Frame):
         self.MG_RadBtt = Radiobutton(self.MG_group, text = text_dict['t32'], variable = self.MG_Var, value = 'Lambda_')
         self.MG_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.MG_RadBtt = Radiobutton(self.MG_group, text = text_dict['t33'], variable = self.MG_Var, value = 'MGfR_-1e-04-')
+        self.MG_RadBtt = Radiobutton(self.MG_group, text = text_dict['t33'], variable = self.MG_Var, value = 'MGfR_1.2-')
         self.MG_RadBtt.grid(row = 0, column = 1, sticky = W)
         self.MG_Var.set('Lambda_')
 
@@ -556,7 +556,7 @@ class Application(Frame):
 
     def MapLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.img_filename + "_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.img_filenamedir + "_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'
@@ -566,13 +566,20 @@ class Application(Frame):
         alpha1, alpha2 = buildlens(filelens)
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
         self.maplensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "LSS"); self.ax.imshow(self.maplensedimage)
+        
+        arr_hand1 = mpimg.imread("SIMCODE.png"); imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0]
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab1)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        self.ax.text(0.05, 0.85, sim_details_text, color='black', bbox=dict(facecolor='none', edgecolor='black', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
+        #imsave(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg", self.maplensedimage)
+        self.fig.savefig(self.savedir + "/" + self.img_filename + "_LensedMap_Photo.jpg")
         self.LensedMap_Photo = self.img_filename + "_LensedMap_Photo.jpg"
     
     def HaloLensedImage(self):
         self.ax.clear(); self.ax.axis('off')
-        fileimage = CWD + "/tmp/" + self.img_filename + "_Photo.jpg"
+        fileimage = CWD + "/tmp/" + self.img_filenamedir + "_Photo.jpg"
         
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filelens = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'
@@ -582,8 +589,15 @@ class Application(Frame):
         alpha1, alpha2 = buildlens(filelens)
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
         self.halolensedimage = deflect(image_arr, alpha1, alpha2, xsize, ysize, self.ComvDist_Var.get(), cosmo, "HALO"); self.ax.imshow(self.halolensedimage)
+            
+        arr_hand1 = mpimg.imread("SIMCODE.png"); imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0]
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab1)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        self.ax.text(0.05, 0.85, sim_details_text, color='black', bbox=dict(facecolor='none', edgecolor='black', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
+        #imsave(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg", self.halolensedimage)
+        self.fig.savefig(self.savedir + "/" + self.img_filename + "_LensedHalo_Photo.jpg")
         self.LensedHalo_Photo = self.img_filename + "_LensedHalo_Photo.jpg"
 
 
@@ -592,8 +606,15 @@ class Application(Frame):
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'kappaBApp_2.fits'; self.Lens_map = fits.getdata(filename, ext=0)
         LenImg = self.ax.imshow(self.Lens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        
+        arr_hand1 = mpimg.imread("SIMCODE.png"); imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0]
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab1)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        self.ax.text(0.05, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", log(self.Lens_map + 1), cmap=matplotlib.cm.magma)
+        #imsave(self.savedir + "/" + self.img_filename + "_LensedMap.jpg", log(self.Lens_map + 1), cmap=matplotlib.cm.magma)
+        self.fig.savefig(self.savedir + "/" + self.img_filename + "_LensedMap.jpg")
         self.LensedMap = self.img_filename + "_LensedMap.jpg"
     
     def showlenscluster(self):
@@ -601,8 +622,15 @@ class Application(Frame):
         Simu_Dir = self.model_select()+"/Lens-Maps/"
         filename = self.simdir + "/" + Simu_Dir + self.model_name +'_Halo.fits'; self.Halo_map = fits.getdata(filename, ext=0)
         HaloImg = self.ax.imshow(self.Halo_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(), interpolation="bicubic") #vmin=1., vmax=1800., clip = True
+        
+        arr_hand1 = mpimg.imread("SIMCODE.png"); imagebox1 = OffsetImage(arr_hand1, zoom=.1); xy = [950.0, 85.0]
+        ab1 = AnnotationBbox(imagebox1, xy, xybox=(0., 0.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab1)
+        sim_details_text = '%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s\n%s: %s' %(text_dict['t42'], self.Name_Var.get(), text_dict['t53'], self.SC_Type, text_dict['t20'], self.DE_type, text_dict['t24'], self.DM_type, text_dict['t27'],  self.EU_Type, text_dict['t31'] , self.MG_Type)
+        self.ax.text(0.05, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
+        
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", log(self.Halo_map + 1), cmap=matplotlib.cm.magma)
+        #imsave(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg", log(self.Halo_map + 1), cmap=matplotlib.cm.magma)
+        self.fig.savefig(self.savedir + "/" + self.img_filename + "_LensedHalo.jpg")
         self.LensedHalo = self.img_filename + "_LensedHalo.jpg"
     
     def run_reset(self):
@@ -620,6 +648,7 @@ class Application(Frame):
                 self.wx = -1.1; self.DE_type = text_dict['t23']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
         elif self.CDM_Var.get()  != 'Lambda_':
             run_type = self.CDM_Var.get(); self.wx = -1.0; self.DM_type = text_dict['t26']; self.DE_type = text_dict['t21']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
+            self.Omega_l_Var.set(0.75); self.Omega_m_Var.set(0.25)
         elif self.IniM_Var.get() != 'Lambda_':
             run_type = self.IniM_Var.get(); self.wx = -1.0
             if run_type == "LocalPNG_1000-":
@@ -628,6 +657,7 @@ class Application(Frame):
                 self.EU_Type = 'Negative'; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.MG_Type = text_dict['t32']
         elif self.MG_Var.get() != 'Lambda_':
             run_type = self.MG_Var.get(); self.wx = -1.0; self.MG_Type = text_dict['t33']; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']
+            self.Omega_l_Var.set(0.75); self.Omega_m_Var.set(0.25)
         else:
             run_type = 'Lambda_'; self.wx = -1.0; self.DE_type = text_dict['t21']; self.DM_type = text_dict['t25']; self.EU_Type = text_dict['t28']; self.MG_Type = text_dict['t32']
 
@@ -656,14 +686,15 @@ class Application(Frame):
         self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi) #, savefig_kwargs={'dpi' : 200}
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
         muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
-        audio_file = "ChillingMusic.wav"
+        audio_file = "ChillingMusic.mp3"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
         self.muxvideo = self.img_filename + "_mux_movie.mp4"
     
     def send_movie(self):
-        files = (self.muxvideo, self.LensedMap, self.LensedMap_Photo, self.LensedHalo, self.LensedHalo_Photo)
-        emailling(self.Name_Var.get(), self.From, self.Email_Var.get(), self.PWD, self.savedir, files)
+        #files=sorted(glob.glob(self.img_filename + '/*'))
+        files = os.listdir(self.savedir + "/" +  self.img_filenamedir)
+        emailling(self.Name_Var.get(), self.From, self.Email_Var.get(), self.PWD, self.savedir + "/" +  self.img_filenamedir, files)
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -683,7 +714,7 @@ class Application(Frame):
         #self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.timetime = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[-1], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
         
-        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg"); imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45]
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filenamedir + "_Photo.jpg"); imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45]
         ab = AnnotationBbox(imagebox, xy, xybox=(50., -70.), xycoords='data', boxcoords="offset points", pad=0.1); self.ax.add_artist(ab)
         
         arr_hand1 = mpimg.imread("SIMCODE.png")
@@ -730,7 +761,7 @@ class Application(Frame):
         self.time = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
 
 
-        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
+        arr_hand = mpimg.imread(CWD + "/tmp/" + self.img_filenamedir + "_Photo.jpg")
         imagebox = OffsetImage(arr_hand, zoom=.08); xy = [0.30, 0.45] # coordinates to position this image
 
         ab = AnnotationBbox(imagebox, xy, xybox=(50., -70.), xycoords='data', boxcoords="offset points", pad=0.1)
@@ -786,16 +817,17 @@ class Application(Frame):
         if not self.Name_Var.get():
             self.statusVariable.set(text_dict['t44'])
             return None
-
-        try:
-            os.stat(CWD + "/tmp/")
-        except:
-            os.mkdir(CWD + "/tmp/")
-
-        self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
-        self.img_filename = self.Name_Var.get(); self.img_filename = ''.join(e for e in self.img_filename if e.isalnum())
         
-        self.img.save(CWD + "/tmp/" + self.img_filename + "_Photo.jpg")
+        self.img = self.img.resize((1024, 1024), Image.ANTIALIAS)
+        self.img_filename = self.Name_Var.get(); self.img_filenamedir = ''.join(e for e in self.img_filename if e.isalnum())
+        
+        try:
+            os.stat(CWD + "/tmp/"); os.stat(self.savedir + "/" + self.img_filenamedir)
+        except:
+            os.mkdir(CWD + "/tmp/"); os.mkdir(self.savedir + "/" + self.img_filenamedir)
+        
+        self.img_filename = self.img_filenamedir  + "/" + self.img_filenamedir
+        self.img.save(CWD + "/tmp/" + self.img_filenamedir + "_Photo.jpg")
         
         #----: CAM stop
         if self._job is not None:
@@ -819,7 +851,7 @@ class Application(Frame):
             self.CDM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
     def models_refresh3(self, *args):
         if self.MG_Var.get() != 'Lambda_':
-            self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_')
+            self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_'); self.Omega_l_Var.set(0.75); self.Omega_m_Var.set(0.25)
 
     def ModelDirectory(self):
         self.modeldirname = tkFileDialog.askdirectory(parent=root, initialdir='/Users/mahmoud/')
@@ -848,6 +880,7 @@ class Application(Frame):
         self.UserName_Var = StringVar()
         self.UserName = Entry(Entry_dialog, textvariable=self.UserName_Var)
         self.UserName.grid(row=0, column=1, sticky= W+E+N+S)
+        self.UserName_Var.set('bbf.unibo@gmail.com')
         
         Label(Entry_dialog, text=text_dict['t47']).grid(row=1, column=0, sticky= W)
         self.PassWord_Var = StringVar()
