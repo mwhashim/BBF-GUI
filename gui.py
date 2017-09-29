@@ -437,7 +437,7 @@ class Application(Frame):
         self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = text_dict['t25'], variable = self.CDM_Var, value = 'Lambda_')
         self.CDM_RadBtt.grid(row = 0, column = 0, sticky = W)
 
-        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = text_dict['t26'], variable = self.CDM_Var, value = 'wDM_0.5-')
+        self.CDM_RadBtt = Radiobutton(self.DarkMatter_group, text = text_dict['t26'], variable = self.CDM_Var, value = 'wDM_0.1-')
         self.CDM_RadBtt.grid(row = 0, column = 1, sticky = W)
         self.CDM_Var.set('Lambda_')
 
@@ -678,7 +678,7 @@ class Application(Frame):
         dens_map = load(filenames[-1]); dens_map1 = load(self.simdir + "/BBF_Lambda_0.25-0.75/Dens-Maps/Lambda_0.25-0.75_snap_299_image.npy")
         self.im0 = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
         self.im1 = self.ax.imshow(dens_map1 + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
-        self.im1.set_visible(False)
+        self.im0.set_visible(False)
 
         #self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.timetime = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[-1], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
@@ -700,7 +700,7 @@ class Application(Frame):
         self.textext = self.ax.text(0.18, 0.85, sim_details_text, color='white', bbox=dict(facecolor='none', edgecolor='white', boxstyle='round,pad=1', alpha=0.5), transform = self.ax.transAxes, alpha = 0.5)
         
         self.ax.axis('off'); self.ax.get_xaxis().set_visible(False); self.ax.get_yaxis().set_visible(False); self.canvas.show()
-        self.toggle_images()
+        self.toggle_images(); self.fig.savefig(self.savedir + "/" + self.img_filename + "_" + self.model_select() + ".jpg")
         self.textext.remove(); self.timetime.remove(); ob.remove(); ab.remove(); ab1.remove()
         self.ax.clear(); self.ax.axis('off')
     
