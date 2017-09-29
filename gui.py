@@ -62,7 +62,7 @@ from textdictENG import text_dict
 def destroy(e): sys.exit()
 
 #--- CAM Read ------
-width, height = 720, 720; dpi = 100
+width, height = 720, 1024 ; dpi = 100
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -230,14 +230,16 @@ class Application(Frame):
         self.Frame_2.grid(row = 0, column = 0, rowspan = 7, columnspan = 2, sticky = W+E+N+S)
         
         # Frame 3 :-----------------------------------------------------
-        self.Frame_3 = Frame(self.master, bg="white", bd= 3, relief= GROOVE)
+        self.Frame_3 = Frame(self.master, bg="black", bd= 3, relief= GROOVE)
         self.Frame_3.grid(row = 0, column = 3, rowspan = 7, columnspan = 3, sticky = W+E+N+S)
     
-        self.ContantFrame = Frame(self.Frame_3); self.ContantFrame.pack(side="top", fill="both", expand=True); self.set_aspect(self.ContantFrame, self.Frame_3, aspect_ratio=1.0/1.0)
+        self.ContantFrame = Frame(self.Frame_3, bg="black", bd= 3, relief= GROOVE); self.ContantFrame.pack(side="top", fill="both", expand=True)
+        self.set_aspect(self.ContantFrame, self.Frame_3, aspect_ratio=1.0/1.0)
     
 #        # Frame 4 :------------------------------------------------------
 #        self.Frame_4 = Frame(self.master, bg="white smoke", bd= 5, relief= RIDGE)
 #        self.Frame_4.grid(row = 4, column = 2, rowspan = 2, columnspan = 3, sticky = W+E+N+S)
+
     def Menubar(self):
         self.menubar = Menu(self.master)
         
