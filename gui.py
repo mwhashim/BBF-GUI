@@ -813,13 +813,13 @@ class Application(Frame):
             self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
     def models_refresh1(self, *args):
         if self.CDM_Var.get() != 'Lambda_':
-            self.Lambda_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
+            self.Lambda_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.MG_Var.set('Lambda_'); self.Omega_l_Var.set(0.75); self.Omega_m_Var.set(0.25)
     def models_refresh2(self, *args):
         if self.IniM_Var.get() != 'Lambda_':
             self.CDM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_'); self.MG_Var.set('Lambda_')
     def models_refresh3(self, *args):
         if self.MG_Var.get() != 'Lambda_':
-            self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_')
+            self.CDM_Var.set('Lambda_'); self.IniM_Var.set('Lambda_'); self.Lambda_Var.set('Lambda_'); self.Omega_l_Var.set(0.75); self.Omega_m_Var.set(0.25)
 
     def ModelDirectory(self):
         self.modeldirname = tkFileDialog.askdirectory(parent=root, initialdir='/Users/mahmoud/')
