@@ -1,6 +1,7 @@
 from __future__ import division
 import os, sys
 sys.setrecursionlimit(50000) # to solve maximum recursion depth exceeded error !!
+sys.dont_write_bytecode = True # to not write pyc files !
 
 import shutil
 import copy
@@ -272,10 +273,12 @@ class Application(Frame):
         self.run.pack(side="left")
 
     def PlotPan(self, frame):
-        fig = plt.Figure(facecolor='0.7')
-        ax = fig.add_subplot(111); ax.axis('off'); ax.get_xaxis().set_visible(False); ax.get_yaxis().set_visible(False)
-        fig.tight_layout()#fig.set_tight_layout(True) 
+        fig = plt.Figure(facecolor='0.7', frameon=False)
+        ax = plt.Axes(fig, [0., 0., 1., 1.]); ax.set_axis_off(); fig.add_axes(ax)#; fig.set_tight_layout(True)
         
+#        ax = fig.add_subplot(111); ax.axis('off'); ax.get_xaxis().set_visible(False); ax.get_yaxis().set_visible(False)
+#        #fig.tight_layout(); fig.set_tight_layout(True)
+
         canvas = FigureCanvasTkAgg(fig, master = frame)
         #self.toolbar = NavigationToolbar2TkAgg(self.canvas, frame)
         #canvas.get_tk_widget().grid(column = 0, row = 0, pady = 5)
@@ -645,8 +648,8 @@ class Application(Frame):
         return model
 
     def save_movie(self):
-        writer = animation.writers['ffmpeg'](fps=15)
-        self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi)
+        writer = animation.writers['ffmpeg'](fps=15)#, bitrate=16000, codec='libx264')
+        self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi) #, savefig_kwargs={'dpi' : 200}
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
         muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
         audio_file = "ChillingMusic.wav"
@@ -669,8 +672,8 @@ class Application(Frame):
         cosmo = wCDM(70.3, self.Omega_m_Var.get(), self.Omega_l_Var.get(), w0=self.wx)
         filenames=sorted(glob.glob(self.simdir + "/" + Simu_Dir +'*.npy')); lga = linspace(log(0.05), log(1.0), 300); a = exp(lga); z = 1./a - 1.0; lktime = cosmo.lookback_time(z).value
         dens_map = load(filenames[-1]); dens_map1 = load(self.simdir + "/BBF_Lambda_0.25-0.75/Dens-Maps/Lambda_0.25-0.75_snap_299_image.npy")
-        self.im0 = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic", aspect='auto')
-        self.im1 = self.ax.imshow(dens_map1 + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic", aspect='auto')
+        self.im0 = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
+        self.im1 = self.ax.imshow(dens_map1 + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")
         self.im1.set_visible(False)
 
         #self.textannotate = self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
@@ -717,7 +720,7 @@ class Application(Frame):
             return im
 
         dens_map = load(filenames[0])#;  dens_map=ndimage.gaussian_filter(dens_map, sigma= sigmaval, truncate=truncateval, mode='wrap') #; dens_map0 = load(filenames[-1]); #print dens_map0.min()+1, dens_map0.max()+1.
-        im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic", aspect='auto')#, clim = (1, 1800.+1.))
+        im = self.ax.imshow(dens_map + 1, cmap=matplotlib.cm.magma, norm=matplotlib.colors.LogNorm(vmin=1., vmax=1800., clip = True), interpolation="bicubic")#, clim = (1, 1800.+1.))
 
         #self.ax.annotate(text_dict['t42'] + self.Name_Var.get(), xy=(0.25, 0.45), fontsize='12', fontstyle = 'oblique', color='white', xycoords='data', xytext=(10., 40.), textcoords='data')
         self.time = self.ax.text(0.1, 0.05 , text_dict['t43'] + ' %s Gyr' %round(lktime[0], 4), horizontalalignment='left', verticalalignment='top',color='white', transform = self.ax.transAxes, fontsize=10)
