@@ -8,15 +8,18 @@ from email.MIMEAudio import MIMEAudio
 from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 
-def emailling(From, To, PWD , FilePath, FileNames):
+from email_text_ENG import welcome word, email_subject, email_body
+
+def emailling(user_name, From, To, PWD , FilePath, FileNames):
     
     msg = MIMEMultipart()
     msg['From'] = From
     msg['To'] = To
     msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = 'Sample subject'
+    msg['Subject'] = email_subject
 
-    msg.attach(MIMEText('Sample message'))
+    msg.attach(MIMEText(welcome word + user_name))
+    msg.attach(MIMEText(email_body))
 
     try:
         smtp = smtplib.SMTP('smtp.gmail.com:587')

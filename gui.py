@@ -62,7 +62,7 @@ from textdictENG import text_dict
 def destroy(e): sys.exit()
 
 #--- CAM Read ------
-width, height = 480, 480; dpi = 100
+width, height = 720, 720; dpi = 100
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -206,7 +206,7 @@ class Application(Frame):
         self.initialize()
         self.Menubar()
         #self.Toolbar(self.Frame_1);
-        self.fig, self.ax, self.canvas = self.PlotPan(self.Frame_3)
+        self.fig, self.ax, self.canvas = self.PlotPan(self.ContantFrame)
         self.MainFrame(self.Frame_2)
 
     def initialize(self):
@@ -228,11 +228,13 @@ class Application(Frame):
         # Frame 2 :-----------------------------------------------------
         self.Frame_2 = Frame(self.master, bg="white", bd= 1, relief= RIDGE)
         self.Frame_2.grid(row = 0, column = 0, rowspan = 7, columnspan = 2, sticky = W+E+N+S)
-
+        
         # Frame 3 :-----------------------------------------------------
         self.Frame_3 = Frame(self.master, bg="white", bd= 3, relief= GROOVE)
         self.Frame_3.grid(row = 0, column = 3, rowspan = 7, columnspan = 3, sticky = W+E+N+S)
-#
+    
+        self.ContantFrame = Frame(self.Frame_3); self.ContantFrame.pack(side="top", fill="both", expand=True); self.set_aspect(self.ContantFrame, self.Frame_3, aspect_ratio=1.0/1.0)
+    
 #        # Frame 4 :------------------------------------------------------
 #        self.Frame_4 = Frame(self.master, bg="white smoke", bd= 5, relief= RIDGE)
 #        self.Frame_4.grid(row = 4, column = 2, rowspan = 2, columnspan = 3, sticky = W+E+N+S)
@@ -659,7 +661,7 @@ class Application(Frame):
     
     def send_movie(self):
         files = (self.muxvideo, self.LensedMap, self.LensedMap_Photo, self.LensedHalo, self.LensedHalo_Photo)
-        emailling(self.From, self.Email_Var.get(), self.PWD, self.savedir, files)
+        emailling(self.Name_Var.get(), self.From, self.Email_Var.get(), self.PWD, self.savedir, files)
 
     def Main_destory(self):
         self.Frame_1.destroy(); self.Frame_2.destroy(); self.Frame_3.destroy();
@@ -863,6 +865,33 @@ class Application(Frame):
             self.nOmega_m_Var.set('0.1')
         else:
             self.nOmega_m_Var.set(str(self.Omega_m_Var.get()))
+
+    def set_aspect(self, content_frame, pad_frame, aspect_ratio):
+        # a function which places a frame within a containing frame, and
+        # then forces the inner frame to keep a specific aspect ratio
+    
+        def enforce_aspect_ratio(event):
+            # when the pad window resizes, fit the content into it,
+            # either by fixing the width or the height and then
+            # adjusting the height or width based on the aspect ratio.
+            
+            # start by using the width as the controlling dimension
+            desired_width = event.width
+            desired_height = int(event.width / aspect_ratio)
+            
+            # if the window is too tall to fit, use the height as
+            # the controlling dimension
+            if desired_height > event.height:
+                desired_height = event.height
+                desired_width = int(event.height * aspect_ratio)
+        
+            # place the window, giving it an explicit size
+            content_frame.place(in_=pad_frame, relx=0.5, rely=0.5, anchor=CENTER,
+                                width=desired_width, height=desired_height)
+
+        pad_frame.bind("<Configure>", enforce_aspect_ratio)
+
+
 
 #--------- RUN ----------------------------
 if __name__ == "__main__":
