@@ -8,7 +8,7 @@ from email.MIMEAudio import MIMEAudio
 from email.Utils import COMMASPACE, formatdate
 from email import Encoders
 
-from email_text_ENG import welcome_word, email_subject, email_body
+from email_text_ITA import welcome_word, email_subject, email_body
 
 def emailling(user_name, From, To, PWD , FilePath, FileNames):
     

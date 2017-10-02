@@ -7,7 +7,7 @@ Omega_DE=(0.75)
 DE_type=(Lambda Quint Phantom)
 fNL=(1000 -1000)
 m_WDM=0.1
-f_R0=-1e-04
+f_R0=1.2
 
 DIR=$1; BBFdir=/home/PERSONALE/shared/BBF/DATA/BBF/
 
@@ -25,15 +25,15 @@ DIR=$1; BBFdir=/home/PERSONALE/shared/BBF/DATA/BBF/
 #done
 #
 #---: Dark Matter suite
-for Omega_m in ${Omega_M[*]}; do
-for Omega_L in ${Omega_DE[*]}; do
-
-model_ID=wDM_${m_WDM}-${Omega_m}-${Omega_L}
-modeldir=${BBFdir}/BBF_${model_ID}
-
-rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
-done
-done
+#for Omega_m in ${Omega_M[*]}; do
+#for Omega_L in ${Omega_DE[*]}; do
+#
+#model_ID=wDM_${m_WDM}-${Omega_m}-${Omega_L}
+#modeldir=${BBFdir}/BBF_${model_ID}
+#
+#rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
+#done
+#done
 #
 ##---: PNG suite
 #for Omega_m in ${Omega_M[*]}; do
@@ -49,15 +49,15 @@ done
 #done
 
 #---: Modified Gravity suite
-#for Omega_m in ${Omega_M[*]}; do
-#for Omega_L in ${Omega_DE[*]}; do
-#
-#model_ID=MGfR_${f_R0}-${Omega_m}-${Omega_L}
-#modeldir=${BBFdir}/BBF_${model_ID}
-#
-#rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
-#done
-#done
+for Omega_m in ${Omega_M[*]}; do
+for Omega_L in ${Omega_DE[*]}; do
+
+model_ID=MGfR_${f_R0}-${Omega_m}-${Omega_L}
+modeldir=${BBFdir}/BBF_${model_ID}
+
+rsync -av --exclude 'ICs' bladerunner:${modeldir} ${DIR}
+done
+done
 
 
 

@@ -56,7 +56,7 @@ from astropy.cosmology import wCDM
 from astropy.io import fits
 
 from emailling import *
-from textdictENG import text_dict
+from textdictITA import text_dict
 
 #----------------------------------
 def destroy(e): sys.exit()
@@ -88,7 +88,7 @@ def deflect(image_arr,image_data1,image_data2,xsize,ysize, scalefac, cosmo, Lens
     
     if LensType == "LSS":
         ds = cosmo.angular_diameter_distance(1.0).value*cosmo.H(0.).value/100.; dl = 1.; dls = 1.
-        f = ds/dl/dls/xsize*1e2 * scalefac
+        f = ds/dl/dls/xsize*7e1 * scalefac
     elif LensType == "HALO":
         ds = cosmo.angular_diameter_distance(1.0).value*cosmo.H(0.).value/100.
         dl = cosmo.angular_diameter_distance(0.5).value*cosmo.H(0.).value/100.
@@ -686,7 +686,7 @@ class Application(Frame):
         self.ani.save(self.savedir + "/" + self.img_filename + "_movie.mp4", writer=writer, dpi=dpi) #, savefig_kwargs={'dpi' : 200}
         video_file = self.savedir + "/" + self.img_filename + "_movie.mp4"
         muxvideo_file = self.savedir + "/" + self.img_filename + "_mux_movie.mp4"
-        audio_file = "ChillingMusic.mp3"
+        audio_file = "ChillingMusic.wav"
         cmd = 'ffmpeg -i '+ video_file + ' -i ' + audio_file + ' -shortest ' + muxvideo_file
         subprocess.call(cmd, shell=True); print('Saving and Muxing Done')
         self.muxvideo = self.img_filename + "_mux_movie.mp4"
